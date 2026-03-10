@@ -32,7 +32,7 @@ export const SUPPORTED_CHAINS = [
 /** Contract addresses — set via env vars; zero-address fallback is a placeholder for local dev only. */
 export const CONTRACTS = {
   /** ARI Settlement contract. */
-  settlement: (import.meta.env.VITE_SETTLEMENT_ADDRESS ?? "0x0000000000000000000000000000000000000000") as `0x${string}`,
+  settlement: (import.meta.env.VITE_SETTLEMENT_ADDRESS ?? "0x536EeDA7d07cF7Af171fBeD8FAe7987a5c63B822") as `0x${string}`,
   /** ARI Intent mempool. */
   intentPool: (import.meta.env.VITE_INTENT_POOL_ADDRESS ?? "0x0000000000000000000000000000000000000000") as `0x${string}`,
 } as const;
