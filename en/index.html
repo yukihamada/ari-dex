@@ -657,8 +657,10 @@
       <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/crates" target="_blank" style="color: var(--text-dim);">Rust workspace (6 crates)</a> — cargo build --release passing</div>
       <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/crates/ari-gateway/src/routes" target="_blank" style="color: var(--text-dim);">API Server</a> — 8 endpoints returning real JSON (health, tokens, pools, quote, intents, liquidity, history)</div>
       <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/crates/ari-engine/src" target="_blank" style="color: var(--text-dim);">Matching Engine</a> — CLMM + OrderBook + BatchAuction + HybridRouter (struct/logic compiled)</div>
-      <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/contracts/src" target="_blank" style="color: var(--text-dim);">Smart Contracts</a> — Settlement.sol, Vault.sol (ERC-721 LP), VaultFactory.sol (EIP-1167), SolverRegistry.sol</div>
-      <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/contracts/test" target="_blank" style="color: var(--text-dim);">Contract Tests</a> — 32 Foundry tests all passing (Settlement 14 + SolverRegistry 18)</div>
+      <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/contracts/src" target="_blank" style="color: var(--text-dim);">Smart Contracts</a> — 13 contracts (Settlement, Vault, VaultFactory, SolverRegistry, AriToken, VeARI, ConditionalIntent, PerpetualMarket, CrossChainIntent, IntentComposer, PrivatePool, AriPaymaster, SimplePriceOracle)</div>
+      <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/contracts/test" target="_blank" style="color: var(--text-dim);">Contract Tests</a> — 188 Foundry tests all passing</div>
+      <div><span style="color: var(--accent);">&#10003;</span> <strong>Ethereum Mainnet Deployed</strong> — All 13 contracts live</div>
+      <div><span style="color: var(--accent);">&#10003;</span> Security Hardening — EIP-712 signatures, SafeERC20, reentrancy guards, oracle price feeds</div>
       <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/frontend/src" target="_blank" style="color: var(--text-dim);">Swap UI</a> — React + Vite + wagmi, connected to API, dark theme, demo mode</div>
       <div><span style="color: var(--accent);">&#10003;</span> Frontend + API single-server — tower-http ServeDir, one port serves everything</div>
       <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/contracts/script" target="_blank" style="color: var(--text-dim);">Deploy Script</a> — Foundry script for any EVM chain</div>
@@ -669,28 +671,29 @@
     <h4 style="margin-top: 24px; margin-bottom: 12px; font-size: 0.95rem; color: var(--warning);">Remaining Tasks</h4>
     <div style="font-size: 0.85rem; color: var(--text-dim); line-height: 2;">
 
-      <div style="margin-top: 8px; color: var(--text); font-weight: 600;">Phase 1 — MVP (Testnet Demo)</div>
-      <div><span style="color: var(--warning);">&#9675;</span> Sepolia/Base Sepoliaにコントラクトデプロイ</div>
-      <div><span style="color: var(--warning);">&#9675;</span> API Serverを Fly.io にデプロイ（デモURL公開）</div>
-      <div><span style="color: var(--warning);">&#9675;</span> ウォレット署名フロー（MetaMask → EIP-712署名 → Intent送信 → Settlement実行）</div>
-      <div><span style="color: var(--warning);">&#9675;</span> リアル価格取得 — Uniswap V3 / Chainlinkオラクル連携（モック価格から切替）</div>
-      <div><span style="color: var(--warning);">&#9675;</span> Intent永続化 — SQLite（インメモリから移行、再起動でデータ消えない）</div>
-      <div><span style="color: var(--warning);">&#9675;</span> Vault.sol テスト追加（Concentrated Liquidity + ERC-721 LP NFT）</div>
+      <div style="margin-top: 8px; color: var(--text); font-weight: 600;">Phase 1 — MVP &#10003; Complete</div>
+      <div><span style="color: var(--accent);">&#10003;</span> Ethereum Mainnet — 13 contracts deployed</div>
+      <div><span style="color: var(--accent);">&#10003;</span> API Server on Fly.io (<a href="https://ari-dex-api.fly.dev" target="_blank" style="color: var(--text-dim);">ari-dex-api.fly.dev</a>)</div>
+      <div><span style="color: var(--accent);">&#10003;</span> Wallet signing flow (MetaMask → EIP-712 → Intent submission)</div>
+      <div><span style="color: var(--accent);">&#10003;</span> Intent persistence — SQLite WAL mode</div>
+      <div><span style="color: var(--accent);">&#10003;</span> Vault.sol — 32 tests (CLMM + ERC-721 LP NFT + reentrancy guard)</div>
 
-      <div style="margin-top: 12px; color: var(--text); font-weight: 600;">Phase 2 — Core Protocol</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> Solver Network — 外部ソルバーがインテントを取得・競争入札する仕組み</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> 暗号化メモプール — BLS閾値暗号によるMEV保護（型定義済み、暗号処理未実装）</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> バッチオークション実行 — 250msバッチのリアルタイムスケジューリング</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> CLMM数学実装 — sqrt price計算、tick bitmap、swap/mint/burn の実ロジック</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> ガスレス取引 — ERC-4337 Account Abstraction統合</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> WebSocket — リアルタイム価格フィード、オーダーブック更新</div>
+      <div style="margin-top: 12px; color: var(--text); font-weight: 600;">Phase 2 — Core Protocol &#10003; Complete</div>
+      <div><span style="color: var(--accent);">&#10003;</span> Solver Network — Dijkstra routing + Dutch auction + scoring</div>
+      <div><span style="color: var(--accent);">&#10003;</span> Encrypted Mempool — AES-256-GCM + Shamir's Secret Sharing</div>
+      <div><span style="color: var(--accent);">&#10003;</span> Batch Auction — Uniform clearing price + 250ms scheduler</div>
+      <div><span style="color: var(--accent);">&#10003;</span> CLMM Math — Q64.96 sqrt price, tick bitmap, swap/mint/burn</div>
+      <div><span style="color: var(--accent);">&#10003;</span> Gasless Trading — AriPaymaster (ERC-4337)</div>
+      <div><span style="color: var(--accent);">&#10003;</span> WebSocket — Real-time price feeds + intent notifications</div>
+      <div><span style="color: var(--accent);">&#10003;</span> $ARI Token + veARI governance (1-4yr lock, linear decay)</div>
+      <div><span style="color: var(--accent);">&#10003;</span> Cross-chain — CrossChainIntent (ERC-7683) + escrow</div>
 
-      <div style="margin-top: 12px; color: var(--text); font-weight: 600;">Phase 3 — Production</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> セキュリティ監査 — Solidityコントラクト（外部監査法人）</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> Ethereum / Arbitrum / Base メインネットデプロイ</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> クロスチェーン — ERC-7683でSolana等との接続</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> ZK-Rollup決済 — L1への証明提出</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> $ARI トークン発行 — Work Token + veARI ガバナンス</div>
+      <div style="margin-top: 12px; color: var(--text); font-weight: 600;">Phase 3 — Production Expansion</div>
+      <div><span style="color: var(--warning);">&#9675;</span> External security audit</div>
+      <div><span style="color: var(--warning);">&#9675;</span> Arbitrum / Base multi-chain deployment</div>
+      <div><span style="color: var(--text-dim);">&#9675;</span> Live price feeds — Chainlink oracle integration</div>
+      <div><span style="color: var(--text-dim);">&#9675;</span> ZK-Rollup settlement</div>
+      <div><span style="color: var(--text-dim);">&#9675;</span> BLS signatures (production implementation)</div>
 
       <div style="margin-top: 12px; color: var(--text); font-weight: 600;">Infra / DevOps</div>
       <div><span style="color: var(--text-dim);">&#9675;</span> CI/CD — GitHub Actions（Rust test + Foundry test + Frontend build）</div>

@@ -657,8 +657,10 @@
       <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/crates" target="_blank" style="color: var(--text-dim);">Rust workspace (6 crates)</a> — cargo build --release 通過</div>
       <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/crates/ari-gateway/src/routes" target="_blank" style="color: var(--text-dim);">APIサーバー</a> — 8エンドポイント（health, tokens, pools, quote, intents, liquidity, history）</div>
       <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/crates/ari-engine/src" target="_blank" style="color: var(--text-dim);">マッチングエンジン</a> — CLMM + OrderBook + BatchAuction + HybridRouter（コンパイル済み）</div>
-      <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/contracts/src" target="_blank" style="color: var(--text-dim);">スマートコントラクト</a> — Settlement.sol, Vault.sol (ERC-721 LP), VaultFactory.sol (EIP-1167), SolverRegistry.sol</div>
-      <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/contracts/test" target="_blank" style="color: var(--text-dim);">コントラクトテスト</a> — Foundry 32テスト全パス（Settlement 14 + SolverRegistry 18）</div>
+      <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/contracts/src" target="_blank" style="color: var(--text-dim);">スマートコントラクト</a> — 13コントラクト（Settlement, Vault, VaultFactory, SolverRegistry, AriToken, VeARI, ConditionalIntent, PerpetualMarket, CrossChainIntent, IntentComposer, PrivatePool, AriPaymaster, SimplePriceOracle）</div>
+      <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/contracts/test" target="_blank" style="color: var(--text-dim);">コントラクトテスト</a> — Foundry 188テスト全パス</div>
+      <div><span style="color: var(--accent);">&#10003;</span> <strong>Ethereumメインネットデプロイ完了</strong> — 全13コントラクト稼働中</div>
+      <div><span style="color: var(--accent);">&#10003;</span> セキュリティ強化 — EIP-712署名検証, SafeERC20, リエントランシーガード, Oracle価格フィード</div>
       <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/frontend/src" target="_blank" style="color: var(--text-dim);">Swap UI</a> — React + Vite + wagmi、API接続済み、ダークテーマ、デモモード</div>
       <div><span style="color: var(--accent);">&#10003;</span> Frontend + API 単一サーバー配信（tower-http ServeDir）</div>
       <div><span style="color: var(--accent);">&#10003;</span> <a href="https://github.com/yukihamada/ari-dex/tree/main/contracts/script" target="_blank" style="color: var(--text-dim);">デプロイスクリプト</a> — 任意のEVMチェーン対応</div>
@@ -669,28 +671,29 @@
     <h4 style="margin-top: 24px; margin-bottom: 12px; font-size: 0.95rem; color: var(--warning);">残りのタスク</h4>
     <div style="font-size: 0.85rem; color: var(--text-dim); line-height: 2;">
 
-      <div style="margin-top: 8px; color: var(--text); font-weight: 600;">Phase 1 — MVP（テストネットデモ）</div>
-      <div><span style="color: var(--warning);">&#9675;</span> Sepolia / Base Sepoliaにコントラクトデプロイ</div>
-      <div><span style="color: var(--warning);">&#9675;</span> APIサーバーをFly.ioにデプロイ（デモURL公開）</div>
-      <div><span style="color: var(--warning);">&#9675;</span> ウォレット署名フロー（MetaMask → EIP-712署名 → Intent送信 → Settlement実行）</div>
-      <div><span style="color: var(--warning);">&#9675;</span> リアル価格取得 — Uniswap V3 / Chainlinkオラクル連携</div>
-      <div><span style="color: var(--warning);">&#9675;</span> Intent永続化 — SQLite（再起動でデータ消えない）</div>
-      <div><span style="color: var(--warning);">&#9675;</span> Vault.sol テスト追加（Concentrated Liquidity + ERC-721 LP NFT）</div>
+      <div style="margin-top: 8px; color: var(--text); font-weight: 600;">Phase 1 — MVP &#10003; 完了</div>
+      <div><span style="color: var(--accent);">&#10003;</span> Ethereumメインネットにコントラクトデプロイ（13コントラクト）</div>
+      <div><span style="color: var(--accent);">&#10003;</span> APIサーバーをFly.ioにデプロイ（<a href="https://ari-dex-api.fly.dev" target="_blank" style="color: var(--text-dim);">ari-dex-api.fly.dev</a>）</div>
+      <div><span style="color: var(--accent);">&#10003;</span> ウォレット署名フロー（MetaMask → EIP-712署名 → Intent送信）</div>
+      <div><span style="color: var(--accent);">&#10003;</span> Intent永続化 — SQLite WALモード</div>
+      <div><span style="color: var(--accent);">&#10003;</span> Vault.sol — 32テスト（CLMM + ERC-721 LP NFT + リエントランシーガード）</div>
 
-      <div style="margin-top: 12px; color: var(--text); font-weight: 600;">Phase 2 — コアプロトコル</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> Solver Network — 外部ソルバーのインテント取得・競争入札</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> 暗号化メモプール — BLS閾値暗号によるMEV保護</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> バッチオークション実行 — 250msリアルタイムスケジューリング</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> CLMM数学実装 — sqrt price計算、tick bitmap、swap/mint/burn</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> ガスレス取引 — ERC-4337 Account Abstraction</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> WebSocket — リアルタイム価格フィード</div>
+      <div style="margin-top: 12px; color: var(--text); font-weight: 600;">Phase 2 — コアプロトコル &#10003; 完了</div>
+      <div><span style="color: var(--accent);">&#10003;</span> Solver Network — Dijkstraルーティング + Dutchオークション + スコアリング</div>
+      <div><span style="color: var(--accent);">&#10003;</span> 暗号化メモプール — AES-256-GCM + Shamir秘密分散</div>
+      <div><span style="color: var(--accent);">&#10003;</span> バッチオークション — 均一清算価格 + 250msスケジューラ</div>
+      <div><span style="color: var(--accent);">&#10003;</span> CLMM数学実装 — Q64.96 sqrt price, tick bitmap, swap/mint/burn</div>
+      <div><span style="color: var(--accent);">&#10003;</span> ガスレス取引 — AriPaymaster (ERC-4337)</div>
+      <div><span style="color: var(--accent);">&#10003;</span> WebSocket — リアルタイム価格フィード + Intent通知</div>
+      <div><span style="color: var(--accent);">&#10003;</span> $ARI トークン + veARI ガバナンス（1-4年ロック、線形減衰）</div>
+      <div><span style="color: var(--accent);">&#10003;</span> クロスチェーン — CrossChainIntent (ERC-7683) + エスクロー</div>
 
-      <div style="margin-top: 12px; color: var(--text); font-weight: 600;">Phase 3 — プロダクション</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> セキュリティ監査（外部監査法人）</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> Ethereum / Arbitrum / Base メインネットデプロイ</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> クロスチェーン — ERC-7683 (Solana等)</div>
+      <div style="margin-top: 12px; color: var(--text); font-weight: 600;">Phase 3 — プロダクション拡張</div>
+      <div><span style="color: var(--warning);">&#9675;</span> セキュリティ監査（外部監査法人）</div>
+      <div><span style="color: var(--warning);">&#9675;</span> Arbitrum / Base マルチチェーンデプロイ</div>
+      <div><span style="color: var(--text-dim);">&#9675;</span> リアル価格取得 — Chainlinkオラクル連携</div>
       <div><span style="color: var(--text-dim);">&#9675;</span> ZK-Rollup決済</div>
-      <div><span style="color: var(--text-dim);">&#9675;</span> $ARI トークン発行 — Work Token + veARI ガバナンス</div>
+      <div><span style="color: var(--text-dim);">&#9675;</span> BLS署名（本番実装）</div>
 
       <div style="margin-top: 12px; color: var(--text); font-weight: 600;">インフラ / DevOps</div>
       <div><span style="color: var(--text-dim);">&#9675;</span> CI/CD — GitHub Actions</div>

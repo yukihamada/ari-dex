@@ -158,13 +158,30 @@ forge script script/Deploy.s.sol \
 - Input validation on all API endpoints
 - Concurrency limiting (100 concurrent requests)
 
+## Mainnet Contracts (Ethereum)
+
+| Contract | Address |
+|----------|---------|
+| Settlement | [`0x536EeDA7d07cF7Af171fBeD8FAe7987a5c63B822`](https://etherscan.io/address/0x536EeDA7d07cF7Af171fBeD8FAe7987a5c63B822) |
+| VaultFactory | [`0x1d06BEDA9797CB52363302bBf2d768a36b53cd5c`](https://etherscan.io/address/0x1d06BEDA9797CB52363302bBf2d768a36b53cd5c) |
+| ARI Token | [`0x3B15dD6d6E5a58b755C70b72fC6e2757F1062d8C`](https://etherscan.io/address/0x3B15dD6d6E5a58b755C70b72fC6e2757F1062d8C) |
+| VeARI | [`0x90dA559495bAb9408F8175eB6F489eab48E20d10`](https://etherscan.io/address/0x90dA559495bAb9408F8175eB6F489eab48E20d10) |
+| SolverRegistry | [`0x72eCef8A9321f5BdaF26Db3AB983c15DE61F9C4E`](https://etherscan.io/address/0x72eCef8A9321f5BdaF26Db3AB983c15DE61F9C4E) |
+| SimplePriceOracle | [`0x0eC4094174F3B8fccc23B829B27A42BA28eCF4c4`](https://etherscan.io/address/0x0eC4094174F3B8fccc23B829B27A42BA28eCF4c4) |
+| ConditionalIntent | [`0x747ffBF3c30Ac13cf54cb242e70Dcb532c4cBD05`](https://etherscan.io/address/0x747ffBF3c30Ac13cf54cb242e70Dcb532c4cBD05) |
+| PerpetualMarket | [`0x5DE57652E281B94b3f40Eb821DaF3e4924bc1A2d`](https://etherscan.io/address/0x5DE57652E281B94b3f40Eb821DaF3e4924bc1A2d) |
+| CrossChainIntent | [`0x64d9F15D3d6349A7B3Cc1b8D6B57bF32d8c12c5A`](https://etherscan.io/address/0x64d9F15D3d6349A7B3Cc1b8D6B57bF32d8c12c5A) |
+| IntentComposer | [`0x081887186409851f58e5229D343657ac84F4F283`](https://etherscan.io/address/0x081887186409851f58e5229D343657ac84F4F283) |
+| PrivatePool | [`0x429bCCb01e5754132D56fAA75CC08e60A53a0618`](https://etherscan.io/address/0x429bCCb01e5754132D56fAA75CC08e60A53a0618) |
+| AriPaymaster | [`0x0c965066f106a94baBCb18db8fC37A5DF4180CAe`](https://etherscan.io/address/0x0c965066f106a94baBCb18db8fC37A5DF4180CAe) |
+
 ## Deployment
 
 | Service | URL | Platform |
 |---------|-----|----------|
 | Spec Site | [dex-spec.fly.dev](https://dex-spec.fly.dev) | Fly.io |
-| API Server | ari-dex-api.fly.dev | Fly.io |
-| Contracts | Sepolia (pending) | Ethereum |
+| API Server | [ari-dex-api.fly.dev](https://ari-dex-api.fly.dev) | Fly.io |
+| Contracts | Ethereum Mainnet | EVM |
 
 ## Supported Chains
 
