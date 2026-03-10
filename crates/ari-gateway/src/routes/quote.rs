@@ -84,22 +84,35 @@ async fn refresh_prices() {
         ids
     );
 
+    tracing::info!("Fetching live prices from CoinGecko...");
     let client = reqwest::Client::builder()
         .user_agent("ARI-DEX/0.1")
+        .timeout(Duration::from_secs(10))
         .build()
         .unwrap_or_default();
     let resp = match client.get(&url).send().await {
-        Ok(r) => r,
+        Ok(r) => {
+            tracing::info!("CoinGecko response status: {}", r.status());
+            r
+        }
         Err(e) => {
-            tracing::warn!("CoinGecko fetch failed: {e}");
+            tracing::error!("CoinGecko fetch failed: {e}");
             return;
         }
     };
 
-    let data: HashMap<String, HashMap<String, f64>> = match resp.json().await {
+    let body = match resp.text().await {
+        Ok(b) => b,
+        Err(e) => {
+            tracing::error!("CoinGecko read body failed: {e}");
+            return;
+        }
+    };
+
+    let data: HashMap<String, HashMap<String, f64>> = match serde_json::from_str(&body) {
         Ok(d) => d,
         Err(e) => {
-            tracing::warn!("CoinGecko parse failed: {e}");
+            tracing::error!("CoinGecko parse failed: {e}, body: {}", &body[..body.len().min(200)]);
             return;
         }
     };
