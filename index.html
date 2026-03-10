@@ -579,8 +579,8 @@
 
     <div class="hero-stats">
       <div class="hero-stat">
-        <div class="hero-stat-value">&lt; 250ms</div>
-        <div class="hero-stat-label">Batch Interval</div>
+        <div class="hero-stat-value">&lt; 300ms</div>
+        <div class="hero-stat-label">End-to-End Latency</div>
       </div>
       <div class="hero-stat">
         <div class="hero-stat-value">0%</div>
@@ -634,6 +634,7 @@
     <table style="max-width: 500px;">
       <tr><td style="color: var(--text);">Repository</td><td><a href="https://github.com/yukihamada/ari-dex" target="_blank" style="color: var(--primary-light); text-decoration: none;">github.com/yukihamada/ari-dex</a></td></tr>
       <tr><td style="color: var(--text);">Phase</td><td>Phase 0 — Architecture Design</td></tr>
+      <tr><td style="color: var(--text);">Target</td><td>Testnet: 10ヶ月 / Mainnet: 20ヶ月 / Full Decentralization: 30ヶ月</td></tr>
       <tr><td style="color: var(--text);">Infra</td><td>Fly.io (Tokyo nrt) / nginx</td></tr>
       <tr><td style="color: var(--text);">Built with</td><td>Claude Code (Opus 4.6) + Multi-Agent</td></tr>
     </table>
@@ -691,9 +692,9 @@
     <div class="card" style="border-top: 3px solid var(--accent);">
       <div style="font-size: 0.72rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px;">Reason 3 — Unfair Advantage</div>
       <h4>AIが開発コストの常識を破壊する</h4>
-      <p>従来50名エンジニアに$30M+必要だった開発を、創業者2名 + AI（電気代のみ）で実現。人件費をほぼゼロにし、資金の大半を流動性とセキュリティに投入。</p>
+      <p>AIがコード生成を加速するが、暗号プロトコルのボトルネックは「数式の検証とセキュリティ担保」。開発費を圧縮した分を、外部監査・フォーマル検証・バグバウンティに全額投入。</p>
       <div style="margin-top: 16px; padding: 14px; background: rgba(6,214,160,0.04); border-radius: 8px; border-left: 3px solid var(--accent); font-size: 0.85rem;">
-        <strong style="color: var(--accent);">ARI:</strong> 2名 + AI。このサイト自体がClaude Opus 4.6のマルチエージェントで仕様策定からデプロイまで1セッションで生成。エンジニア採用費ゼロ。
+        <strong style="color: var(--accent);">ARI:</strong> AIでコード生成を10倍加速。ただし暗号・ZKの検証には外部専門家を必須配置。浮いた資金はセキュリティ監査（3社）とバグバウンティ（$10M）に全振り。
       </div>
     </div>
   </div>
@@ -731,8 +732,8 @@
 
   <div class="metric-grid reveal">
     <div class="metric">
-      <div class="metric-value">&lt; 1ms</div>
-      <div class="metric-label">Matching Latency</div>
+      <div class="metric-value">&lt; 300ms</div>
+      <div class="metric-label">End-to-End Latency</div>
     </div>
     <div class="metric">
       <div class="metric-value">10K+</div>
@@ -747,6 +748,9 @@
       <div class="metric-label">MEV Rebate</div>
     </div>
   </div>
+  <p class="reveal" style="color: var(--text-dim); font-size: 0.78rem; margin-top: 8px;">
+    * End-to-End Latency = 250ms batch interval + engine processing。ユーザー体験としての約定確認時間。エンジン単体の処理は &lt; 1ms だが、バッチオークション設計上、ユーザー体感は250ms+となる。
+  </p>
 
   <div class="card-grid reveal" style="margin-top: 32px;">
     <div class="card">
@@ -997,7 +1001,7 @@ ws.<span class="c-fn">send</span>({ <span class="c-str">"subscribe"</span>: [
       <tr><td style="color: var(--text); font-weight: 600;">Model</td><td>AMM</td><td>Batch Auction</td><td>Aggregator</td><td>OrderBook</td><td class="compare-good">Hybrid + Intent</td></tr>
       <tr><td style="color: var(--text); font-weight: 600;">MEV Protection</td><td class="compare-bad">Hook-dependent</td><td>Batch (30s)</td><td class="compare-bad">None</td><td>Partial</td><td class="compare-good">Encrypted + Batch (250ms)</td></tr>
       <tr><td style="color: var(--text); font-weight: 600;">Cross-chain</td><td class="compare-bad">EVM only</td><td>EVM only</td><td class="compare-bad">Solana only</td><td class="compare-bad">Cosmos</td><td class="compare-good">EVM + SVM + Any</td></tr>
-      <tr><td style="color: var(--text); font-weight: 600;">Latency</td><td>~12s</td><td>~30s</td><td>~400ms</td><td>~1s</td><td class="compare-good">&lt; 500ms</td></tr>
+      <tr><td style="color: var(--text); font-weight: 600;">Latency (E2E)</td><td>~12s (block)</td><td>~30s (batch)</td><td>~400ms</td><td>~1s</td><td class="compare-good">&lt; 300ms (250ms batch + engine)</td></tr>
       <tr><td style="color: var(--text); font-weight: 600;">Cost</td><td>$1-50</td><td>$0.50-5</td><td>&lt; $0.01</td><td>$0</td><td class="compare-good">&lt; $0.001</td></tr>
       <tr><td style="color: var(--text); font-weight: 600;">Gasless</td><td class="compare-bad">No</td><td class="compare-good">Yes</td><td class="compare-bad">No</td><td class="compare-good">Yes</td><td class="compare-good">Yes</td></tr>
     </tbody>
@@ -1011,38 +1015,43 @@ ws.<span class="c-fn">send</span>({ <span class="c-str">"subscribe"</span>: [
 <div class="container">
   <div class="section-label reveal">Roadmap</div>
   <h2 class="reveal">Development <span class="gradient">Timeline</span></h2>
-  <p class="section-sub reveal">24ヶ月で完全分散化まで</p>
+  <p class="section-sub reveal">30ヶ月で完全分散化まで。暗号・ZKの検証フェーズに十分な時間を確保。</p>
 
   <div class="timeline reveal">
     <div class="timeline-item">
       <div class="period">Phase 0 &mdash; Month 0-3</div>
-      <h4>Foundation</h4>
-      <p>チーム構築、設計確定、AI（Claude/Cursor）で高速プロトタイピング。Rust workspace + CI/CD。</p>
+      <h4>Foundation &amp; Prototyping</h4>
+      <p>設計確定、AIでRust workspace + CI/CDセットアップ。閾値暗号ライブラリの選定・PoC。暗号学アドバイザー契約。</p>
     </div>
     <div class="timeline-item">
-      <div class="period">Phase 1 &mdash; Month 3-9</div>
+      <div class="period">Phase 1 &mdash; Month 3-10</div>
       <h4>Core Protocol + Testnet</h4>
-      <p>ari-engine、ari-gateway、ari-solver 実装。テストネットローンチ。ソルバーパートナー3社+。</p>
+      <p>ari-engine（バッチオークション）、ari-gateway、ari-crypto 実装。暗号プリミティブの数学的検証に4ヶ月。テストネットローンチ。</p>
     </div>
     <div class="timeline-item">
-      <div class="period">Phase 2 &mdash; Month 9-12</div>
-      <h4>Audit + Bug Bounty</h4>
-      <p>3社監査 + フォーマル検証。Immunefi $10Mバウンティ。クローズドベータ。</p>
+      <div class="period">Phase 2 &mdash; Month 10-12</div>
+      <h4>Solver Bootstrap</h4>
+      <p>自社リファレンスソルバー稼働。Wintermute/GSR等の大手MM 2-3社とパイロット契約（初期は手数料ゼロ + 報酬プログラムで誘引）。最低限の流動性で価格競争力を実証。</p>
     </div>
     <div class="timeline-item">
-      <div class="period">Phase 3 &mdash; Month 12-15</div>
-      <h4>Mainnet Launch</h4>
-      <p>Ethereum + Arbitrum + Base。$ARIトークンTGE。流動性マイニング開始。</p>
+      <div class="period">Phase 3 &mdash; Month 12-16</div>
+      <h4>Audit &amp; Formal Verification</h4>
+      <p>3社監査（Trail of Bits / OpenZeppelin / Spearbit）。Certora フォーマル検証。Immunefi $10Mバウンティ開始。修正→再監査サイクルに十分な期間。</p>
     </div>
     <div class="timeline-item">
-      <div class="period">Phase 4 &mdash; Month 15-18</div>
-      <h4>Multi-chain</h4>
-      <p>Solana対応。クロスチェーンインテント。TVL $500M目標。</p>
+      <div class="period">Phase 4 &mdash; Month 16-20</div>
+      <h4>Mainnet Launch (EVM)</h4>
+      <p>Ethereum + Arbitrum + Base。$ARIトークンTGE。流動性マイニング開始。段階的にリミット引上げ（初月 TVL cap $50M）。</p>
     </div>
     <div class="timeline-item">
-      <div class="period">Phase 5 &mdash; Month 18-24</div>
+      <div class="period">Phase 5 &mdash; Month 20-24</div>
+      <h4>Multi-chain + Scale</h4>
+      <p>Solana対応。クロスチェーンインテント有効化。ソルバーネットワーク拡大（10社+）。TVL $500M目標。</p>
+    </div>
+    <div class="timeline-item">
+      <div class="period">Phase 6 &mdash; Month 24-30</div>
       <h4>Full Decentralization</h4>
-      <p>分散型シーケンサー。ガバナンス完全移譲。プロトコル自律。</p>
+      <p>分散型シーケンサー移行。ガバナンス完全移譲。Guardian Multisig解散。プロトコル自律。</p>
     </div>
   </div>
 </div>
@@ -1053,15 +1062,34 @@ ws.<span class="c-fn">send</span>({ <span class="c-str">"subscribe"</span>: [
 <div class="container">
   <div class="section-label reveal">Investment</div>
   <h2 class="reveal">Budget <span class="gradient">Allocation</span></h2>
-  <p class="section-sub reveal">100億円（~$67M）の配分</p>
+  <p class="section-sub reveal">段階的調達を前提とした資金計画。シード$5M → テストネット実績でシリーズA $20M+を目指す。</p>
 
-  <div class="budget-bar reveal">
-    <div style="width: 30%; background: linear-gradient(90deg, #4f46e5, var(--primary));">Dev 30%</div>
-    <div style="width: 25%; background: linear-gradient(90deg, #059669, var(--accent));">Liquidity 25%</div>
-    <div style="width: 15%; background: linear-gradient(90deg, #dc2626, var(--danger));">Security 15%</div>
-    <div style="width: 15%; background: linear-gradient(90deg, #d97706, var(--warning));">Team 15%</div>
-    <div style="width: 10%; background: linear-gradient(90deg, #7c3aed, #8b5cf6);">Mktg 10%</div>
-    <div style="width: 5%; background: #475569;">Legal</div>
+  <h3 class="reveal" style="margin-bottom: 16px;">Phase別 資金計画</h3>
+  <div class="reveal">
+  <table>
+    <thead><tr><th>Round</th><th>金額</th><th>用途</th><th>条件</th></tr></thead>
+    <tbody>
+      <tr><td style="color: var(--text);"><strong>Seed</strong></td><td>$3-5M</td><td>コア開発（2名+AI+外部暗号専門家）、テストネット構築</td><td>設計書+PoC</td></tr>
+      <tr><td style="color: var(--text);"><strong>Series A</strong></td><td>$15-25M</td><td>監査（3社）、ソルバーブートストラップ、初期流動性</td><td>テストネット稼働実績</td></tr>
+      <tr><td style="color: var(--text);"><strong>Series B / Token</strong></td><td>$30-50M</td><td>流動性マイニング、マルチチェーン展開、エコシステム助成</td><td>メインネットTVL実績</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 class="reveal" style="margin-top: 32px; margin-bottom: 16px;">Solver Cold Start 戦略</h3>
+  <div class="card-grid reveal">
+    <div class="card">
+      <h4>Step 1: 自社リファレンスソルバー</h4>
+      <p>初期はARI自身がソルバーとして稼働。主要DEX（Uniswap/Curve/Balancer）のオンチェーン流動性をルーティング。最低限の価格競争力を自前で保証。</p>
+    </div>
+    <div class="card">
+      <h4>Step 2: 大手MM招致</h4>
+      <p>Wintermute/GSR/Flowに対し、初期6ヶ月は手数料ゼロ+ソルバー報酬プログラム（月$50K〜）を提供。実績あるMMの参加で価格改善を実証。</p>
+    </div>
+    <div class="card">
+      <h4>Step 3: ソルバーSDK公開</h4>
+      <p>ari-solverをOSSで公開し、誰でもソルバーとして参加可能に。ソルバー数の増加 → 価格改善 → ユーザー増 → さらにソルバー参入のフライホイール。</p>
+    </div>
   </div>
 </div>
 </section>
