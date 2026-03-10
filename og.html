@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body {
+    margin: 0;
+    width: 1200px;
+    height: 630px;
+    background: linear-gradient(135deg, #05050a 0%, #0c0c1a 50%, #0a0a14 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #e2e8f0;
+    position: relative;
+    overflow: hidden;
+  }
+  body::before {
+    content: '';
+    position: absolute;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 900px; height: 900px;
+    background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(6,214,160,0.08) 40%, transparent 70%);
+  }
+  .content { position: relative; text-align: center; }
+  .logo {
+    font-size: 120px;
+    font-weight: 900;
+    letter-spacing: -5px;
+    background: linear-gradient(135deg, #818cf8, #06d6a0, #00b4d8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .sub {
+    font-size: 28px;
+    color: #8892a8;
+    margin-top: 8px;
+    letter-spacing: 2px;
+  }
+  .tags {
+    margin-top: 32px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+  .tag {
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    background: rgba(99,102,241,0.12);
+    border: 1px solid rgba(99,102,241,0.25);
+    color: #818cf8;
+  }
+  .founders {
+    margin-top: 40px;
+    font-size: 18px;
+    color: #4a5568;
+  }
+</style>
+</head>
+<body>
+<div class="content">
+  <div class="logo">ARI</div>
+  <div class="sub">Intent-Based DEX &middot; MEV Protection by Design</div>
+  <div class="tags">
+    <div class="tag">Encrypted Mempool</div>
+    <div class="tag">250ms Batch Auction</div>
+    <div class="tag">Cross-Chain Intents</div>
+  </div>
+  <div class="founders">by Ariyasu & Hamada</div>
+</div>
+</body>
+</html>
