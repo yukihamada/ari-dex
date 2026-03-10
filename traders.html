@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARI — For Traders</title>
+
+<!-- OGP -->
+<meta property="og:title" content="ARI — For Traders">
+<meta property="og:description" content="Trade on any chain with zero gas fees, MEV protection, and the best prices — automatically.">
+<meta property="og:type" content="website">
+
+<style>
+  :root {
+    --bg: #05050a;
+    --surface: #0c0c14;
+    --border: #1a1a2e;
+    --primary: #6366f1;
+    --primary-light: #818cf8;
+    --accent: #06d6a0;
+    --accent2: #00b4d8;
+    --text: #e2e8f0;
+    --text-dim: #8892a8;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --glow: rgba(99,102,241,0.15);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(5,5,10,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0;
+  }
+  nav .container {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  nav .nav-logo {
+    font-weight: 800;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-right: 16px;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+  nav a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  nav a:hover { background: var(--surface); color: var(--text); }
+
+  /* ===== HERO ===== */
+  .hero {
+    position: relative;
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 20px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, rgba(6,214,160,0.06) 40%, transparent 70%);
+    animation: heroGlow 6s ease-in-out infinite;
+  }
+  @keyframes heroGlow {
+    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.6; }
+    50% { transform: translateX(-50%) scale(1.15); opacity: 1; }
+  }
+  .hero-content { position: relative; z-index: 2; }
+  .hero-badge {
+    display: inline-block;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: rgba(6,214,160,0.1);
+    border: 1px solid rgba(6,214,160,0.2);
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: 4rem;
+    font-weight: 900;
+    letter-spacing: -2px;
+    background: linear-gradient(135deg, #818cf8 0%, #06d6a0 50%, #00b4d8 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientShift 4s ease-in-out infinite;
+    margin-bottom: 16px;
+  }
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  .hero p {
+    font-size: 1.3rem;
+    color: var(--text-dim);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* ===== SECTIONS ===== */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  section {
+    padding: 80px 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  section:last-of-type { border-bottom: none; }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--primary-light);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  h2 .gradient {
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .section-sub { color: var(--text-dim); margin-bottom: 40px; font-size: 0.95rem; max-width: 600px; }
+
+  /* ===== CARDS ===== */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-3px); }
+  .card:hover::before { opacity: 1; }
+  .card-icon { font-size: 2rem; margin-bottom: 12px; }
+  .card h4 { font-size: 1.1rem; margin-bottom: 8px; font-weight: 700; }
+  .card p { color: var(--text-dim); font-size: 0.88rem; }
+
+  /* ===== REVEAL ANIMATION ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== PROBLEM CALLOUT ===== */
+  .problem-box {
+    background: linear-gradient(135deg, rgba(239,68,68,0.06), rgba(245,158,11,0.06));
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 32px;
+  }
+  .problem-box h3 {
+    color: var(--danger);
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+  }
+  .problem-box p {
+    color: var(--text-dim);
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-bottom: 12px;
+  }
+  .stat-highlight {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--danger);
+    display: block;
+    margin: 16px 0 8px;
+  }
+
+  /* ===== PROTECTION CARDS ===== */
+  .protect-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    transition: all 0.3s;
+  }
+  .protect-card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-2px); }
+  .protect-icon {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
+  .protect-card h4 { font-size: 1.1rem; margin-bottom: 6px; font-weight: 700; }
+  .protect-card p { color: var(--text-dim); font-size: 0.9rem; }
+
+  /* ===== FLOW STEPS ===== */
+  .steps-container {
+    display: flex;
+    gap: 24px;
+    margin: 40px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 28px;
+    text-align: center;
+    flex: 1;
+    min-width: 240px;
+    max-width: 320px;
+    transition: all 0.3s;
+    position: relative;
+  }
+  .step-card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-4px); }
+  .step-num {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: #fff;
+    margin: 0 auto 20px;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+  }
+  .step-card h4 { font-size: 1.1rem; margin-bottom: 8px; }
+  .step-card p { color: var(--text-dim); font-size: 0.88rem; }
+  .step-arrow {
+    display: flex;
+    align-items: center;
+    color: var(--accent);
+    font-size: 1.6rem;
+    opacity: 0.5;
+    flex-shrink: 0;
+    align-self: center;
+  }
+
+  /* ===== TABLE ===== */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+  th {
+    text-align: left;
+    padding: 16px 20px;
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    color: var(--primary-light);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  td { padding: 16px 20px; border-bottom: 1px solid var(--border); color: var(--text-dim); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(99,102,241,0.02); }
+  .compare-good { color: var(--accent) !important; font-weight: 600; }
+  .compare-bad { color: var(--danger) !important; }
+
+  /* ===== METRICS ===== */
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 20px 0; }
+  .metric {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  .metric:hover { border-color: rgba(99,102,241,0.3); }
+  .metric-value {
+    font-size: 2.4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .metric-label { color: var(--text-dim); font-size: 0.75rem; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ===== CTA ===== */
+  .cta-section {
+    text-align: center;
+    padding: 100px 20px;
+  }
+  .cta-section h2 {
+    font-size: 2.8rem;
+    margin-bottom: 16px;
+  }
+  .cta-section p {
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    margin-bottom: 40px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .btn {
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), #4f46e5);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(99,102,241,0.4); }
+  .btn-lg {
+    padding: 18px 48px;
+    font-size: 1.1rem;
+    border-radius: 14px;
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover { border-color: var(--primary-light); background: rgba(99,102,241,0.05); }
+  .cta-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .coming-soon {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-top: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    border-top: 1px solid var(--border);
+    position: relative;
+  }
+  footer .footer-logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  footer a { color: var(--primary-light); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ===== SANDWICH VISUAL ===== */
+  .sandwich-visual {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 24px 0;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+  }
+  .sandwich-visual .tx-line {
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin: 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .tx-bot {
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.15);
+    color: var(--danger);
+  }
+  .tx-you {
+    background: rgba(99,102,241,0.08);
+    border: 1px solid rgba(99,102,241,0.15);
+    color: var(--primary-light);
+  }
+  .tx-label {
+    font-weight: 700;
+    min-width: 60px;
+  }
+
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 2.6rem; }
+    .hero p { font-size: 1rem; }
+    h2 { font-size: 1.6rem; }
+    .card-grid { grid-template-columns: 1fr; }
+    .metric-grid { grid-template-columns: repeat(2, 1fr); }
+    .steps-container { flex-direction: column; align-items: center; }
+    .step-arrow { transform: rotate(90deg); }
+    .protect-card { flex-direction: column; }
+    .cta-section h2 { font-size: 2rem; }
+    .problem-box { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <div class="container">
+    <a href="index.html" class="nav-logo">ARI</a>
+    <a href="#problem">The Problem</a>
+    <a href="#protection">Protection</a>
+    <a href="#best-price">Best Price</a>
+    <a href="#zero-gas">Zero Gas</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="#compare">Compare</a>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">Built for Traders</div>
+    <h1>For Traders</h1>
+    <p>Stop losing money to invisible bots. ARI gives you the best price, on any chain, with zero gas fees.</p>
+  </div>
+</div>
+
+<!-- ===== PROBLEM ===== -->
+<section id="problem">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">The Problem Today</div>
+      <h2>You're Being <span class="gradient">Robbed</span> Every Time You Trade</h2>
+      <p class="section-sub">And you probably don't even know it.</p>
+    </div>
+
+    <div class="problem-box reveal">
+      <h3>What's actually happening?</h3>
+      <p>When you submit a swap on a regular DEX, your order sits in a public waiting room (called a "mempool") before it gets processed. During that brief moment, automated bots can see exactly what you're about to do.</p>
+      <p>These bots jump in front of your trade, buy the token before you, push the price up, then sell right after you buy — pocketing the difference. This is called a <strong style="color: var(--text);">sandwich attack</strong>.</p>
+      <p>Think of it like someone cutting in line at a store, buying up all the discounted items, then reselling them to you at a higher price.</p>
+    </div>
+
+    <div class="sandwich-visual reveal">
+      <div style="color: var(--text-dim); margin-bottom: 12px; font-family: Inter, sans-serif; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px;">How a sandwich attack works:</div>
+      <div class="tx-line tx-bot">
+        <span class="tx-label">BOT</span>
+        <span>Buys ETH first, pushing the price up</span>
+      </div>
+      <div class="tx-line tx-you">
+        <span class="tx-label">YOU</span>
+        <span>Your swap goes through at a worse price</span>
+      </div>
+      <div class="tx-line tx-bot">
+        <span class="tx-label">BOT</span>
+        <span>Sells ETH right after you, taking the profit</span>
+      </div>
+    </div>
+
+    <div class="metric-grid reveal">
+      <div class="metric">
+        <div class="metric-value" style="-webkit-text-fill-color: unset; background: none; color: var(--danger);">$900M+</div>
+        <div class="metric-label">Lost by traders to MEV in 2025</div>
+      </div>
+      <div class="metric">
+        <div class="metric-value" style="-webkit-text-fill-color: unset; background: none; color: var(--danger);">Every 12 sec</div>
+        <div class="metric-label">A sandwich attack happens</div>
+      </div>
+      <div class="metric">
+        <div class="metric-value" style="-webkit-text-fill-color: unset; background: none; color: var(--warning);">$5-50</div>
+        <div class="metric-label">Average loss per swap</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROTECTION ===== -->
+<section id="protection">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">How ARI Protects You</div>
+      <h2>Your Trades Are <span class="gradient">Invisible</span> to Bots</h2>
+      <p class="section-sub">Three layers of protection, working together.</p>
+    </div>
+
+    <div class="protect-card reveal">
+      <div class="protect-icon">&#128274;</div>
+      <div>
+        <h4>Your Order Is Encrypted</h4>
+        <p>When you submit a trade on ARI, it's immediately encrypted. Nobody — not bots, not validators, not even us — can see your order details until it's been processed. Bots can't front-run what they can't see.</p>
+      </div>
+    </div>
+
+    <div class="protect-card reveal">
+      <div class="protect-icon">&#9878;</div>
+      <div>
+        <h4>Fair Price for Everyone</h4>
+        <p>ARI collects all orders within a 250-millisecond window and processes them as a batch. Every order in that batch gets the same fair price. No one can jump ahead of you because there's no "line" to cut.</p>
+      </div>
+    </div>
+
+    <div class="protect-card reveal">
+      <div class="protect-icon">&#128176;</div>
+      <div>
+        <h4>80% MEV Returned to You</h4>
+        <p>Even after all protections, if there's any remaining value that would normally go to bots (called MEV), ARI captures it and returns 80% directly back to you. You keep the money that used to be stolen.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BEST PRICE ===== -->
+<section id="best-price">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Best Price, Any Chain</div>
+      <h2>One Swap. <span class="gradient">Every Chain.</span></h2>
+      <p class="section-sub">You just say what you want. ARI handles the rest.</p>
+    </div>
+
+    <div class="card-grid reveal">
+      <div class="card">
+        <div class="card-icon">&#127758;</div>
+        <h4>Cross-Chain, Automatically</h4>
+        <p>Want to swap ETH on Ethereum for USDC on Arbitrum? Just enter the trade. ARI's solver network searches across all major chains and DEXs to find you the absolute best rate. No manual bridging, no switching networks.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#128161;</div>
+        <h4>Solvers Compete For You</h4>
+        <p>Multiple solvers race to fill your order at the best price. They compete against each other — which means you always win. Think of it like having dozens of brokers fighting to get you the best deal.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#9889;</div>
+        <h4>Under 300ms</h4>
+        <p>The entire process — from you clicking "swap" to your trade being filled — takes less than 300 milliseconds. That's faster than you can blink.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ZERO GAS ===== -->
+<section id="zero-gas">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Zero Gas Fees</div>
+      <h2>No ETH for Gas? <span class="gradient">No Problem.</span></h2>
+      <p class="section-sub">Trade without worrying about gas fees ever again.</p>
+    </div>
+
+    <div class="card-grid reveal">
+      <div class="card">
+        <div class="card-icon">&#9981;</div>
+        <h4>Gasless Trading</h4>
+        <p>ARI uses a technology called "account abstraction" so you never have to pay gas fees yourself. No more keeping ETH in your wallet just to make trades. No more failed transactions because gas ran out.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#128179;</div>
+        <h4>Just Connect and Trade</h4>
+        <p>If you have the token you want to sell, that's all you need. ARI handles the gas behind the scenes. It's as simple as trading on Binance — but fully decentralized, and you keep your own keys.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section id="how-it-works">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">How It Works</div>
+      <h2>Three Simple <span class="gradient">Steps</span></h2>
+      <p class="section-sub">As easy as any centralized exchange. Easier, actually.</p>
+    </div>
+
+    <div class="steps-container reveal">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h4>Connect Wallet</h4>
+        <p>Connect your MetaMask, Rabby, or any wallet. Your keys, your crypto — always.</p>
+      </div>
+      <div class="step-arrow">&#8594;</div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h4>Enter Your Swap</h4>
+        <p>Pick the tokens and amount. For example: "1 ETH to USDC." That's it.</p>
+      </div>
+      <div class="step-arrow">&#8594;</div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h4>Get the Best Price</h4>
+        <p>ARI's solvers find the best price across all chains. Your trade is protected and filled in under 300ms.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== COMPARISON ===== -->
+<section id="compare">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Side by Side</div>
+      <h2>Traditional DEX vs <span class="gradient">ARI</span></h2>
+      <p class="section-sub">See the difference.</p>
+    </div>
+
+    <div class="table-wrap reveal">
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Traditional DEX</th>
+            <th>ARI</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color: var(--text); font-weight: 600;">MEV Protection</td>
+            <td class="compare-bad">None — bots can see and front-run your orders</td>
+            <td class="compare-good">Full — orders are encrypted and batched</td>
+          </tr>
+          <tr>
+            <td style="color: var(--text); font-weight: 600;">Gas Fees</td>
+            <td class="compare-bad">You pay $2-50+ per transaction</td>
+            <td class="compare-good">Zero gas fees</td>
+          </tr>
+          <tr>
+            <td style="color: var(--text); font-weight: 600;">Speed</td>
+            <td class="compare-bad">12-60 seconds (or more)</td>
+            <td class="compare-good">Under 300 milliseconds</td>
+          </tr>
+          <tr>
+            <td style="color: var(--text); font-weight: 600;">Cross-Chain</td>
+            <td class="compare-bad">Manual bridges (slow, risky, expensive)</td>
+            <td class="compare-good">Automatic — one click, any chain</td>
+          </tr>
+          <tr>
+            <td style="color: var(--text); font-weight: 600;">Price</td>
+            <td class="compare-bad">One DEX, one chain</td>
+            <td class="compare-good">Best price found across all DEXs and chains</td>
+          </tr>
+          <tr>
+            <td style="color: var(--text); font-weight: 600;">MEV Rebate</td>
+            <td class="compare-bad">None — bots keep everything</td>
+            <td class="compare-good">80% returned to you</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta-section">
+  <div class="container reveal">
+    <h2><span class="gradient">Start Trading</span> the Fair Way</h2>
+    <p>No bots. No gas fees. No bridges. Just the best price, always.</p>
+    <div class="cta-buttons">
+      <a href="#" class="btn btn-primary btn-lg" onclick="event.preventDefault();">Start Trading</a>
+      <a href="index.html" class="btn btn-outline btn-lg">Read the Spec</a>
+    </div>
+    <div class="coming-soon">Coming Soon</div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-logo">ARI</div>
+    <p>Arithmetic of Intents</p>
+    <p style="margin-top: 16px;">
+      <a href="index.html">Technical Spec</a>
+    </p>
+    <p style="margin-top: 12px; font-size: 0.75rem;">ARI &mdash; Arithmetic of Intents &middot; 2026</p>
+  </div>
+</footer>
+
+<!-- ===== REVEAL ANIMATION ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+});
+</script>
+
+</body>
+</html>

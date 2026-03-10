@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARI — Liquidity Providers</title>
+
+<meta property="og:title" content="ARI — For Liquidity Providers">
+<meta property="og:description" content="Earn trading fees and $ARI rewards with MEV-protected liquidity pools. Concentrated liquidity, veARI boost, transparent risks.">
+<meta property="og:type" content="website">
+
+<style>
+  :root {
+    --bg: #05050a;
+    --surface: #0c0c14;
+    --border: #1a1a2e;
+    --primary: #6366f1;
+    --primary-light: #818cf8;
+    --accent: #06d6a0;
+    --accent2: #00b4d8;
+    --text: #e2e8f0;
+    --text-dim: #8892a8;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --glow: rgba(99,102,241,0.15);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ===== PARTICLES ===== */
+  #particles {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    position: relative;
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, rgba(6,214,160,0.06) 40%, transparent 70%);
+    animation: heroGlow 6s ease-in-out infinite;
+  }
+  @keyframes heroGlow {
+    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.6; }
+    50% { transform: translateX(-50%) scale(1.15); opacity: 1; }
+  }
+  .hero-content { position: relative; z-index: 2; }
+
+  .logo {
+    font-size: 6rem;
+    font-weight: 900;
+    letter-spacing: -3px;
+    background: linear-gradient(135deg, #818cf8 0%, #06d6a0 50%, #00b4d8 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientShift 4s ease-in-out infinite;
+    margin-bottom: 8px;
+  }
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  .logo-sub {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+
+  .hero-title {
+    font-size: 2.4rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  .hero-desc {
+    color: var(--text-dim);
+    font-size: 1rem;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(5,5,10,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0;
+  }
+  nav .container {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  nav .nav-logo {
+    font-weight: 800;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-right: 16px;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+  nav a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  nav a:hover { background: var(--surface); color: var(--text); }
+
+  /* ===== SECTIONS ===== */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  section {
+    padding: 80px 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  section:last-of-type { border-bottom: none; }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--primary-light);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  h2 .gradient {
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .section-sub { color: var(--text-dim); margin-bottom: 40px; font-size: 0.95rem; max-width: 600px; }
+
+  /* ===== CARDS ===== */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-3px); }
+  .card:hover::before { opacity: 1; }
+  .card-icon { font-size: 2rem; margin-bottom: 12px; }
+  .card h4 { font-size: 1.1rem; margin-bottom: 8px; font-weight: 700; }
+  .card p { color: var(--text-dim); font-size: 0.88rem; }
+
+  /* ===== REVEAL ANIMATION ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== FLOW STEPS ===== */
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 12px;
+    transition: background 0.3s;
+  }
+  .flow-step:hover { background: rgba(99,102,241,0.03); }
+  .flow-num {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(99,102,241,0.3);
+  }
+  .flow-content h4 { font-size: 1rem; margin-bottom: 4px; }
+  .flow-content p { color: var(--text-dim); font-size: 0.88rem; }
+
+  /* ===== TABLE ===== */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.88rem; }
+  th {
+    text-align: left;
+    padding: 14px 16px;
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    color: var(--primary-light);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  td { padding: 14px 16px; border-bottom: 1px solid var(--border); color: var(--text-dim); }
+  tr:hover td { background: rgba(99,102,241,0.02); }
+
+  /* ===== METRICS ===== */
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 20px 0; }
+  .metric {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  .metric:hover { border-color: rgba(99,102,241,0.3); }
+  .metric-value {
+    font-size: 2.4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .metric-label { color: var(--text-dim); font-size: 0.75rem; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ===== THESIS BOX (reused for highlight boxes) ===== */
+  .thesis-box {
+    background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(6,214,160,0.06));
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 40px;
+    position: relative;
+  }
+  .thesis-box::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(6,214,160,0.2));
+    z-index: -1;
+    filter: blur(20px);
+    opacity: 0.5;
+  }
+
+  /* ===== TAGS ===== */
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .tag-green { background: rgba(6,214,160,0.15); color: var(--accent); }
+  .tag-yellow { background: rgba(245,158,11,0.15); color: var(--warning); }
+  .tag-red { background: rgba(239,68,68,0.15); color: var(--danger); }
+
+  /* ===== COMPARE ===== */
+  .compare-good { color: var(--accent) !important; font-weight: 600; }
+  .compare-bad { color: var(--danger) !important; }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), #4f46e5);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(99,102,241,0.4); }
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover { border-color: var(--primary-light); background: rgba(99,102,241,0.05); }
+  .btn-disabled {
+    background: var(--surface);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  /* ===== RISK BOX ===== */
+  .risk-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--warning);
+    border-radius: 0 12px 12px 0;
+    padding: 20px 24px;
+    margin: 12px 0;
+  }
+  .risk-item h4 { font-size: 0.95rem; margin-bottom: 6px; }
+  .risk-item p { color: var(--text-dim); font-size: 0.85rem; }
+  .risk-item .mitigation {
+    margin-top: 8px;
+    font-size: 0.82rem;
+    color: var(--accent);
+  }
+
+  /* ===== BOOST VISUAL ===== */
+  .boost-bar {
+    display: flex;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 36px;
+    margin: 20px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+  .boost-bar div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    padding: 0 8px;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    border-top: 1px solid var(--border);
+    position: relative;
+  }
+  footer .footer-logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  footer a { color: var(--primary-light); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 768px) {
+    .logo { font-size: 4rem; }
+    .hero-title { font-size: 1.6rem; }
+    h2 { font-size: 1.6rem; }
+    .card-grid { grid-template-columns: 1fr; }
+    .metric-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Particles Background -->
+<canvas id="particles"></canvas>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="hero-content">
+    <a href="index.html" style="text-decoration: none;">
+      <div class="logo">ARI</div>
+    </a>
+    <div class="logo-sub">Arithmetic of Intents</div>
+    <div class="hero-title">For Liquidity Providers</div>
+    <p class="hero-desc">Earn trading fees and $ARI rewards in MEV-protected pools. Concentrated liquidity for capital efficiency, with full transparency on risks.</p>
+  </div>
+</div>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <div class="container">
+    <a href="index.html" class="nav-logo">ARI</a>
+    <a href="#why">Why ARI</a>
+    <a href="#how">How It Works</a>
+    <a href="#veari">veARI Boost</a>
+    <a href="#rewards">Rewards</a>
+    <a href="#fees">Fee Tiers</a>
+    <a href="#risks">Risks</a>
+  </div>
+</nav>
+
+<!-- ===== WHY PROVIDE LIQUIDITY ===== -->
+<section id="why">
+<div class="container">
+  <div class="section-label reveal">Liquidity</div>
+  <h2 class="reveal">Why Provide Liquidity on <span class="gradient">ARI</span></h2>
+  <p class="section-sub reveal">ARI's batch auction architecture fundamentally changes the LP experience. No more value extraction by MEV bots.</p>
+
+  <div class="card-grid">
+    <div class="card reveal">
+      <div class="card-icon">&#128737;</div>
+      <h4>MEV Protection = Less Impermanent Loss</h4>
+      <p>ARI's encrypted mempool and batch auction model eliminates sandwich attacks. Your pool is not front-run, so you keep more of the value you provide. Studies show MEV extraction costs LPs 5-8% of annual returns on traditional AMMs.</p>
+    </div>
+    <div class="card reveal">
+      <div class="card-icon">&#127919;</div>
+      <h4>Concentrated Liquidity (Uniswap V3 Style)</h4>
+      <p>Allocate your capital to specific price ranges (tick ranges) where trading actually happens. Earn more fees with less capital deployed. Up to 4000x capital efficiency compared to full-range positions.</p>
+    </div>
+    <div class="card reveal">
+      <div class="card-icon">&#128200;</div>
+      <h4>Multiple Revenue Streams</h4>
+      <p>Earn from trading fees, $ARI emission rewards, and MEV rebate shares. Lock $ARI for veARI to boost your APR up to 2.5x. Your LP positions are ERC-721 NFTs, composable across DeFi.</p>
+    </div>
+  </div>
+
+  <div class="metric-grid reveal" style="margin-top: 32px;">
+    <div class="metric">
+      <div class="metric-value">0%</div>
+      <div class="metric-label">Sandwich Attack Risk</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">4000x</div>
+      <div class="metric-label">Max Capital Efficiency</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">2.5x</div>
+      <div class="metric-label">Max veARI Boost</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">ERC-721</div>
+      <div class="metric-label">NFT Positions</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section id="how">
+<div class="container">
+  <div class="section-label reveal">Process</div>
+  <h2 class="reveal">How It <span class="gradient">Works</span></h2>
+  <p class="section-sub reveal">Four steps to start earning. Each LP position is minted as an ERC-721 NFT that you own and control.</p>
+
+  <div class="reveal">
+    <div class="flow-step">
+      <div class="flow-num">1</div>
+      <div class="flow-content">
+        <h4>Deposit a Token Pair</h4>
+        <p>Select any supported trading pair (e.g., ETH/USDC, WBTC/ETH). Deposit both tokens in the ratio determined by your selected price range.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">2</div>
+      <div class="flow-content">
+        <h4>Select Your Price Range (Tick Range)</h4>
+        <p>Choose the price bounds where your liquidity will be active. Narrower ranges earn more fees per dollar but require more active management. The UI provides suggested ranges based on historical volatility.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">3</div>
+      <div class="flow-content">
+        <h4>Earn Trading Fees + $ARI Rewards</h4>
+        <p>When trades execute within your price range, you earn a proportional share of trading fees. Additionally, $ARI emission rewards are distributed to active liquidity providers every epoch (7 days).</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">4</div>
+      <div class="flow-content">
+        <h4>Manage or Compose Your Position</h4>
+        <p>Your LP position is an ERC-721 NFT. Adjust your range, add/remove liquidity, or use it as collateral in other DeFi protocols. Full composability with the broader ecosystem.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== veARI BOOST ===== -->
+<section id="veari">
+<div class="container">
+  <div class="section-label reveal">Boost</div>
+  <h2 class="reveal"><span class="gradient">veARI</span> Boost</h2>
+  <p class="section-sub reveal">Lock $ARI to receive veARI (vote-escrowed ARI) and multiply your LP rewards. Longer lock duration = greater boost.</p>
+
+  <div class="thesis-box reveal">
+    <h4 style="margin-bottom: 16px; font-size: 1.1rem;">Boost Multiplier by Lock Duration</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Lock Duration</th>
+          <th>veARI Multiplier</th>
+          <th>Effective APR Boost</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>No lock</td>
+          <td style="color: var(--text);">1.0x</td>
+          <td>Base rate</td>
+        </tr>
+        <tr>
+          <td>3 months</td>
+          <td style="color: var(--text);">1.25x</td>
+          <td class="compare-good">+25% APR</td>
+        </tr>
+        <tr>
+          <td>6 months</td>
+          <td style="color: var(--text);">1.5x</td>
+          <td class="compare-good">+50% APR</td>
+        </tr>
+        <tr>
+          <td>1 year</td>
+          <td style="color: var(--text);">2.0x</td>
+          <td class="compare-good">+100% APR</td>
+        </tr>
+        <tr>
+          <td>2 years (max)</td>
+          <td style="color: var(--text);">2.5x</td>
+          <td class="compare-good">+150% APR</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="color: var(--text-dim); font-size: 0.82rem; margin-top: 16px;">veARI balance decays linearly toward zero as the lock expiration approaches. You can extend your lock at any time to maintain or increase your boost.</p>
+  </div>
+
+  <div class="boost-bar reveal">
+    <div style="width: 40%; background: linear-gradient(90deg, #4f46e5, var(--primary-light));">Base APR (1.0x)</div>
+    <div style="width: 20%; background: linear-gradient(90deg, var(--primary-light), #a78bfa);">+0.5x (6mo)</div>
+    <div style="width: 20%; background: linear-gradient(90deg, #a78bfa, var(--accent));">+1.0x (1yr)</div>
+    <div style="width: 20%; background: linear-gradient(90deg, var(--accent), var(--accent2));">+1.5x (2yr)</div>
+  </div>
+
+  <div class="card-grid reveal">
+    <div class="card">
+      <div class="card-icon">&#9878;</div>
+      <h4>Governance Power</h4>
+      <p>veARI holders vote on protocol parameters: fee tiers, emission schedules, new pool whitelisting, and treasury allocation. 1 veARI = 1 vote.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#128176;</div>
+      <h4>Protocol Revenue Share</h4>
+      <p>A portion of protocol trading fees is distributed to veARI holders proportional to their veARI balance. Aligns long-term incentives.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== REWARD SOURCES ===== -->
+<section id="rewards">
+<div class="container">
+  <div class="section-label reveal">Revenue</div>
+  <h2 class="reveal">Reward <span class="gradient">Sources</span></h2>
+  <p class="section-sub reveal">Three distinct revenue streams for liquidity providers, each with different characteristics.</p>
+
+  <div class="reveal">
+    <table>
+      <thead>
+        <tr>
+          <th>Source</th>
+          <th>Mechanism</th>
+          <th>Distribution</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color: var(--text); font-weight: 600;">Trading Fees</td>
+          <td>Proportional to your share of in-range liquidity</td>
+          <td>Real-time, per-swap</td>
+          <td>Varies by fee tier and volume</td>
+        </tr>
+        <tr>
+          <td style="color: var(--text); font-weight: 600;">$ARI Emission Rewards</td>
+          <td>From 45% ecosystem allocation (token supply)</td>
+          <td>Weekly epochs</td>
+          <td>Boosted by veARI; subject to governance vote on emission rate</td>
+        </tr>
+        <tr>
+          <td style="color: var(--text); font-weight: 600;">MEV Rebate Share</td>
+          <td>Recaptured MEV from batch auctions redistributed to LPs</td>
+          <td>Per-batch settlement</td>
+          <td>Unique to ARI; value that other DEXs leak to searchers</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-grid reveal" style="margin-top: 32px;">
+    <div class="card">
+      <div class="card-icon">&#128184;</div>
+      <h4>Fee Accrual</h4>
+      <p>Trading fees accrue directly to your LP position. No claiming needed -- they compound automatically by increasing your position's token balances.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#127760;</div>
+      <h4>MEV Rebate (ARI-Exclusive)</h4>
+      <p>Traditional DEXs leak value to MEV searchers. ARI's batch auction captures this surplus and returns it to LPs and traders. This is net-new revenue that does not exist on other platforms.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== FEE TIERS ===== -->
+<section id="fees">
+<div class="container">
+  <div class="section-label reveal">Fee Structure</div>
+  <h2 class="reveal">Fee <span class="gradient">Tiers</span></h2>
+  <p class="section-sub reveal">Three tiers designed for different asset volatility profiles. LPs choose their tier when creating a position.</p>
+
+  <div class="reveal">
+    <table>
+      <thead>
+        <tr>
+          <th>Fee Tier</th>
+          <th>Best For</th>
+          <th>Examples</th>
+          <th>Expected Spread</th>
+          <th>Typical LP Strategy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color: var(--accent); font-weight: 700;">0.01%</td>
+          <td>Stablecoin pairs</td>
+          <td style="color: var(--text);">USDC/USDT, DAI/USDC</td>
+          <td>Very tight</td>
+          <td>Narrow range, high volume</td>
+        </tr>
+        <tr>
+          <td style="color: var(--primary-light); font-weight: 700;">0.05%</td>
+          <td>Major pairs</td>
+          <td style="color: var(--text);">ETH/USDC, WBTC/ETH</td>
+          <td>Moderate</td>
+          <td>Medium range, balanced</td>
+        </tr>
+        <tr>
+          <td style="color: var(--warning); font-weight: 700;">0.30%</td>
+          <td>Exotic / volatile pairs</td>
+          <td style="color: var(--text);">New tokens, long-tail assets</td>
+          <td>Wide</td>
+          <td>Wide range, higher fee per trade</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="thesis-box reveal" style="margin-top: 32px;">
+    <h4 style="margin-bottom: 12px;">Fee Split</h4>
+    <p style="color: var(--text-dim); font-size: 0.88rem; margin-bottom: 16px;">Of each trading fee collected:</p>
+    <div class="boost-bar">
+      <div style="width: 80%; background: linear-gradient(90deg, var(--primary), var(--primary-light));">80% to LPs</div>
+      <div style="width: 10%; background: linear-gradient(90deg, var(--primary-light), var(--accent));">10% Treasury</div>
+      <div style="width: 10%; background: linear-gradient(90deg, var(--accent), var(--accent2));">10% veARI</div>
+    </div>
+    <p style="color: var(--text-dim); font-size: 0.78rem; margin-top: 12px;">Fee split percentages are subject to governance vote by veARI holders.</p>
+  </div>
+</div>
+</section>
+
+<!-- ===== RISK TRANSPARENCY ===== -->
+<section id="risks">
+<div class="container">
+  <div class="section-label reveal">Transparency</div>
+  <h2 class="reveal">Risk <span class="gradient">Disclosure</span></h2>
+  <p class="section-sub reveal">Providing liquidity carries real risks. We believe LPs deserve full transparency, not just marketing.</p>
+
+  <div class="risk-item reveal">
+    <h4>&#9888; Impermanent Loss</h4>
+    <p>Impermanent loss (IL) is inherent to all AMM liquidity provision. When the price ratio of your deposited tokens changes, your position's value diverges from simply holding. Concentrated liquidity amplifies both fees earned and IL exposure.</p>
+    <div class="mitigation">Mitigation: ARI's batch auction model eliminates sandwich-attack-driven IL. Historical data from similar mechanisms shows 5-8% reduction in IL compared to traditional AMMs. However, IL from organic price movement remains.</div>
+  </div>
+
+  <div class="risk-item reveal">
+    <h4>&#9888; Smart Contract Risk</h4>
+    <p>All DeFi protocols carry smart contract risk. Bugs or vulnerabilities could result in partial or total loss of deposited funds.</p>
+    <div class="mitigation">Mitigation: 3 independent security audits planned (pre-mainnet). $10M bug bounty program. Formal verification of core settlement logic. Timelock on all admin functions. No proxy upgradability on core contracts.</div>
+  </div>
+
+  <div class="risk-item reveal">
+    <h4>&#9888; Active Management Required</h4>
+    <p>Concentrated liquidity positions require active monitoring. If the market price moves outside your selected range, your position stops earning fees entirely and you hold 100% of the less-valuable token.</p>
+    <div class="mitigation">Mitigation: ARI will provide automated range-adjustment vaults (post-launch). The UI includes price alerts and range health indicators. Full-range positions remain available for passive LPs (lower capital efficiency).</div>
+  </div>
+
+  <div class="risk-item reveal" style="border-left-color: var(--text-dim);">
+    <h4>&#9888; Protocol Risk</h4>
+    <p>ARI is under active development (Phase 0). The protocol has not launched yet. Token economics, fee structures, and boost mechanics described on this page represent the current design and may change before mainnet.</p>
+    <div class="mitigation">All changes to finalized parameters will go through governance vote by veARI holders post-launch.</div>
+  </div>
+
+  <div class="thesis-box reveal" style="margin-top: 32px;">
+    <h4 style="margin-bottom: 12px;">ARI vs. Traditional DEX: IL Comparison</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Traditional AMM</th>
+          <th>ARI (Batch Auction)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color: var(--text);">Sandwich attack IL</td>
+          <td class="compare-bad">Exposed (5-8% annual drag)</td>
+          <td class="compare-good">Eliminated (encrypted mempool)</td>
+        </tr>
+        <tr>
+          <td style="color: var(--text);">Organic price movement IL</td>
+          <td>Present</td>
+          <td>Present (same as any AMM)</td>
+        </tr>
+        <tr>
+          <td style="color: var(--text);">JIT liquidity attacks</td>
+          <td class="compare-bad">Exposed (fee dilution)</td>
+          <td class="compare-good">Mitigated (batch settlement)</td>
+        </tr>
+        <tr>
+          <td style="color: var(--text);">MEV leakage</td>
+          <td class="compare-bad">Leaked to searchers</td>
+          <td class="compare-good">Recaptured and redistributed</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section>
+<div class="container" style="text-align: center; padding: 60px 0;">
+  <div class="reveal">
+    <h2>Ready to <span class="gradient">Provide Liquidity</span>?</h2>
+    <p class="section-sub" style="margin: 16px auto 32px;">ARI is currently in development. Join the community to be notified when LP deposits open.</p>
+    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+      <span class="btn btn-disabled">Provide Liquidity (Coming Soon)</span>
+      <a href="index.html" class="btn btn-outline">Read the Spec</a>
+      <a href="https://github.com/yukihamada/ari-dex" target="_blank" class="btn btn-outline">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-logo">ARI</div>
+    <p>Intent-Based DEX with MEV Protection</p>
+    <p style="margin-top: 16px;">
+      <a href="index.html">Home</a>
+      &nbsp;&middot;&nbsp;
+      <a href="https://github.com/yukihamada/ari-dex" target="_blank">GitHub</a>
+      &nbsp;&middot;&nbsp;
+      Built with Claude Code (Opus 4.6)
+    </p>
+  </div>
+</footer>
+
+<script>
+// ===== PARTICLES =====
+(function() {
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < 60; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      size: Math.random() * 2 + 0.5,
+      opacity: Math.random() * 0.3 + 0.1
+    });
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0) p.x = canvas.width;
+      if (p.x > canvas.width) p.x = 0;
+      if (p.y < 0) p.y = canvas.height;
+      if (p.y > canvas.height) p.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(99, 102, 241, ${p.opacity})`;
+      ctx.fill();
+    });
+
+    // Draw connections
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(99, 102, 241, ${0.06 * (1 - dist / 120)})`;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+// ===== SCROLL REVEAL =====
+(function() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARI — Developers & Solvers</title>
+
+<!-- OGP -->
+<meta property="og:title" content="ARI — For Developers & Solvers">
+<meta property="og:description" content="Build on ARI DEX. Architecture, API reference, Solver guide, SDKs, and smart contract docs.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dex-spec.fly.dev/developers.html">
+<meta property="og:image" content="https://dex-spec.fly.dev/og.png">
+
+<style>
+  :root {
+    --bg: #05050a;
+    --surface: #0c0c14;
+    --border: #1a1a2e;
+    --primary: #6366f1;
+    --primary-light: #818cf8;
+    --accent: #06d6a0;
+    --accent2: #00b4d8;
+    --text: #e2e8f0;
+    --text-dim: #8892a8;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --glow: rgba(99,102,241,0.15);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    position: relative;
+    min-height: 50vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, rgba(6,214,160,0.06) 40%, transparent 70%);
+    animation: heroGlow 6s ease-in-out infinite;
+  }
+  @keyframes heroGlow {
+    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.6; }
+    50% { transform: translateX(-50%) scale(1.15); opacity: 1; }
+  }
+  .hero-content { position: relative; z-index: 2; }
+
+  .logo {
+    font-size: 4rem;
+    font-weight: 900;
+    letter-spacing: -3px;
+    background: linear-gradient(135deg, #818cf8 0%, #06d6a0 50%, #00b4d8 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientShift 4s ease-in-out infinite;
+    margin-bottom: 8px;
+  }
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  .logo-sub {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .hero-title {
+    font-size: 2.4rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-desc {
+    color: var(--text-dim);
+    font-size: 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(5,5,10,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0;
+  }
+  nav .container {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  nav .nav-logo {
+    font-weight: 800;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-right: 16px;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+  nav a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  nav a:hover { background: var(--surface); color: var(--text); }
+
+  /* ===== SECTIONS ===== */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  section {
+    padding: 80px 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  section:last-of-type { border-bottom: none; }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--primary-light);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  h2 .gradient {
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .section-sub { color: var(--text-dim); margin-bottom: 40px; font-size: 0.95rem; max-width: 600px; }
+
+  /* ===== CARDS ===== */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-3px); }
+  .card:hover::before { opacity: 1; }
+  .card-icon { font-size: 2rem; margin-bottom: 12px; }
+  .card h4 { font-size: 1.1rem; margin-bottom: 8px; font-weight: 700; }
+  .card p { color: var(--text-dim); font-size: 0.88rem; }
+
+  /* ===== REVEAL ANIMATION ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== ARCH DIAGRAM ===== */
+  .arch-layer {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 24px;
+    margin: 10px 0;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .arch-layer:hover { border-color: rgba(99,102,241,0.3); }
+  .arch-layer::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    width: 3px;
+    height: 100%;
+  }
+  .arch-layer .layer-name { font-weight: 700; color: var(--primary-light); font-size: 0.9rem; }
+  .arch-layer .layer-desc { color: var(--text-dim); font-size: 0.82rem; margin-top: 2px; }
+  .arch-arrow { text-align: center; color: var(--accent); font-size: 1.4rem; margin: 4px 0; opacity: 0.5; }
+
+  /* ===== CODE ===== */
+  .code-block {
+    background: #08080e;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.82rem;
+    overflow-x: auto;
+    line-height: 1.7;
+    margin: 16px 0;
+    position: relative;
+  }
+  .code-block .lang-tag {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .c-comment { color: #4a5568; }
+  .c-kw { color: var(--primary-light); }
+  .c-str { color: var(--accent); }
+  .c-type { color: #f59e0b; }
+  .c-fn { color: #3b82f6; }
+
+  /* ===== TABLE ===== */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.88rem; }
+  th {
+    text-align: left;
+    padding: 14px 16px;
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    color: var(--primary-light);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  td { padding: 14px 16px; border-bottom: 1px solid var(--border); color: var(--text-dim); }
+  tr:hover td { background: rgba(99,102,241,0.02); }
+
+  /* ===== TAGS ===== */
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .tag-rust { background: rgba(222,100,50,0.15); color: #de6432; }
+  .tag-sol { background: rgba(99,102,241,0.15); color: var(--primary-light); }
+  .tag-ts { background: rgba(59,130,246,0.15); color: #3b82f6; }
+  .tag-zk { background: rgba(6,214,160,0.15); color: var(--accent); }
+
+  /* ===== FLOW STEPS ===== */
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 12px;
+    transition: background 0.3s;
+  }
+  .flow-step:hover { background: rgba(99,102,241,0.03); }
+  .flow-num {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(99,102,241,0.3);
+  }
+  .flow-content h4 { font-size: 1rem; margin-bottom: 4px; }
+  .flow-content p { color: var(--text-dim); font-size: 0.88rem; }
+
+  /* ===== METRIC ===== */
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 20px 0; }
+  .metric {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  .metric:hover { border-color: rgba(99,102,241,0.3); }
+  .metric-value {
+    font-size: 2.4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .metric-label { color: var(--text-dim); font-size: 0.75rem; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ===== BTN ===== */
+  .btn {
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), #4f46e5);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(99,102,241,0.4); }
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover { border-color: var(--primary-light); background: rgba(99,102,241,0.05); }
+
+  /* ===== FOOTER ===== */
+  footer {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    border-top: 1px solid var(--border);
+    position: relative;
+  }
+  footer .footer-logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  footer a { color: var(--primary-light); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ===== RATE LIMIT TIERS ===== */
+  .tier-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 24px; }
+  .tier-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  .tier-card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-3px); }
+  .tier-name { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+  .tier-rate {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 8px 0;
+  }
+  .tier-unit { color: var(--text-dim); font-size: 0.78rem; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .logo { font-size: 3rem; }
+    .hero-title { font-size: 1.6rem; }
+    h2 { font-size: 1.6rem; }
+    .card-grid { grid-template-columns: 1fr; }
+    .metric-grid { grid-template-columns: repeat(2, 1fr); }
+    .tier-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="logo">ARI</div>
+    <div class="logo-sub">Arithmetic of Intents</div>
+    <div class="hero-title">For Developers &amp; Solvers</div>
+    <p class="hero-desc">Everything you need to build on ARI, integrate the intent protocol, or run a solver node.</p>
+  </div>
+</div>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <div class="container">
+    <a href="index.html" class="nav-logo">ARI</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#api">API</a>
+    <a href="#solvers">Solvers</a>
+    <a href="#sdk">SDK &amp; Tools</a>
+    <a href="#contracts">Contracts</a>
+    <a href="#intent-schema">Intent Schema</a>
+    <a href="#github">GitHub</a>
+  </div>
+</nav>
+
+<!-- ===== 1. ARCHITECTURE OVERVIEW ===== -->
+<section id="architecture">
+<div class="container">
+  <div class="section-label reveal">System Design</div>
+  <h2 class="reveal"><span class="gradient">Architecture</span> Overview</h2>
+  <p class="section-sub reveal">ARI is a 5-layer stack. Every layer is modular and independently upgradable.</p>
+
+  <div class="reveal">
+    <div class="arch-layer" style="background: linear-gradient(90deg, rgba(99,102,241,0.04), transparent);">
+      <div style="--c: var(--primary-light);" class="layer-name">Layer 5 &mdash; Frontend</div>
+      <div class="layer-desc">React SPA, Mobile SDK, React Widget. Users express intents through a simple swap UI. No chain selection needed.</div>
+    </div>
+    <div class="arch-arrow">&darr;</div>
+
+    <div class="arch-layer" style="background: linear-gradient(90deg, rgba(0,180,216,0.04), transparent);">
+      <div style="color: var(--accent2);" class="layer-name">Layer 4 &mdash; Gateway</div>
+      <div class="layer-desc">REST + WebSocket API. Validates intents, rate-limits, and routes to the solver network. Handles Permit2 signature verification.</div>
+    </div>
+    <div class="arch-arrow">&darr;</div>
+
+    <div class="arch-layer" style="background: linear-gradient(90deg, rgba(6,214,160,0.04), transparent);">
+      <div style="color: var(--accent);" class="layer-name">Layer 3 &mdash; Solver Network</div>
+      <div class="layer-desc">Competing solvers discover optimal execution routes across all connected chains. Dutch auction determines the winning solver for each batch.</div>
+    </div>
+    <div class="arch-arrow">&darr;</div>
+
+    <div class="arch-layer" style="background: linear-gradient(90deg, rgba(245,158,11,0.04), transparent);">
+      <div style="color: var(--warning);" class="layer-name">Layer 2 &mdash; Matching Engine</div>
+      <div class="layer-desc">Encrypted batch auction. Threshold decryption reveals intents simultaneously. Uniform clearing price prevents MEV extraction.</div>
+    </div>
+    <div class="arch-arrow">&darr;</div>
+
+    <div class="arch-layer" style="background: linear-gradient(90deg, rgba(239,68,68,0.04), transparent);">
+      <div style="color: var(--danger);" class="layer-name">Layer 1 &mdash; Settlement</div>
+      <div class="layer-desc">On-chain contracts (Ethereum, Arbitrum, Base). Settlement.sol executes fills atomically. Vault.sol manages CLMM liquidity positions as ERC-721 NFTs.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== 2. API QUICK START ===== -->
+<section id="api">
+<div class="container">
+  <div class="section-label reveal">Integration</div>
+  <h2 class="reveal">API <span class="gradient">Quick Start</span></h2>
+  <p class="section-sub reveal">RESTful endpoints for intents and quotes, plus real-time WebSocket streams for market data.</p>
+
+  <h3 style="font-size: 1.1rem; margin-bottom: 16px; margin-top: 24px;" class="reveal">REST Endpoints</h3>
+
+  <div class="reveal">
+    <table>
+      <thead>
+        <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="color: var(--accent); font-weight: 600;">POST</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/intents</td><td>Submit a new intent (swap, limit, TWAP)</td></tr>
+        <tr><td style="color: var(--accent2); font-weight: 600;">GET</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/intents/{id}</td><td>Query intent status and fill details</td></tr>
+        <tr><td style="color: var(--accent2); font-weight: 600;">GET</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/quote</td><td>Get an indicative quote (no commitment)</td></tr>
+        <tr><td style="color: var(--accent2); font-weight: 600;">GET</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/pools</td><td>List active liquidity pools with TVL</td></tr>
+        <tr><td style="color: var(--accent2); font-weight: 600;">GET</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/pools/{id}/ticks</td><td>Tick-level liquidity distribution</td></tr>
+        <tr><td style="color: var(--accent2); font-weight: 600;">GET</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/solvers</td><td>Active solver registry and performance</td></tr>
+        <tr><td style="color: var(--warning); font-weight: 600;">DELETE</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/intents/{id}</td><td>Cancel a pending intent (before batch close)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="code-block reveal">
+    <span class="lang-tag">curl</span>
+<span class="c-comment"># Submit a swap intent</span>
+curl -X POST https://api.ari.exchange/v1/intents \
+  -H <span class="c-str">"Content-Type: application/json"</span> \
+  -H <span class="c-str">"Authorization: Bearer $API_KEY"</span> \
+  -d <span class="c-str">'{
+    "sell_token": "0xC02...ETH",
+    "buy_token":  "0xA0b...USDC",
+    "sell_amount": "1000000000000000000",
+    "max_slippage_bps": 50,
+    "source_chain": "ethereum",
+    "dest_chain": "arbitrum",
+    "deadline": 1710000000
+  }'</span>
+  </div>
+
+  <h3 style="font-size: 1.1rem; margin-bottom: 16px; margin-top: 40px;" class="reveal">WebSocket Streams</h3>
+  <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 16px;" class="reveal">Connect to <code style="color: var(--primary-light); background: var(--surface); padding: 2px 8px; border-radius: 4px;">wss://api.ari.exchange/v1/ws</code> and subscribe to channels:</p>
+
+  <div class="reveal">
+    <table>
+      <thead>
+        <tr><th>Channel</th><th>Payload</th><th>Update Frequency</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">ticker:{pair}</td><td>Best bid/ask, 24h volume, last price</td><td>100ms</td></tr>
+        <tr><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">orderbook:{pair}</td><td>Top 20 bid/ask levels with depth</td><td>250ms</td></tr>
+        <tr><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">trades:{pair}</td><td>Executed trades with solver attribution</td><td>Real-time</td></tr>
+        <tr><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">intents:status</td><td>Your intent lifecycle updates</td><td>Real-time</td></tr>
+        <tr><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">batches</td><td>Batch open/close/settle events</td><td>Per batch (~500ms)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="code-block reveal">
+    <span class="lang-tag">json</span>
+<span class="c-comment">// Subscribe to ETH-USDC ticker</span>
+{
+  <span class="c-str">"op"</span>: <span class="c-str">"subscribe"</span>,
+  <span class="c-str">"channel"</span>: <span class="c-str">"ticker:ETH-USDC"</span>
+}
+
+<span class="c-comment">// Response</span>
+{
+  <span class="c-str">"channel"</span>: <span class="c-str">"ticker:ETH-USDC"</span>,
+  <span class="c-str">"data"</span>: {
+    <span class="c-str">"bid"</span>: <span class="c-str">"3412.85"</span>,
+    <span class="c-str">"ask"</span>: <span class="c-str">"3413.02"</span>,
+    <span class="c-str">"last"</span>: <span class="c-str">"3412.90"</span>,
+    <span class="c-str">"volume_24h"</span>: <span class="c-str">"48291.7"</span>,
+    <span class="c-str">"timestamp"</span>: <span class="c-type">1710000000000</span>
+  }
+}
+  </div>
+
+  <h3 style="font-size: 1.1rem; margin-bottom: 16px; margin-top: 40px;" class="reveal">Rate Limits</h3>
+  <div class="tier-grid reveal">
+    <div class="tier-card">
+      <div class="tier-name">Free</div>
+      <div class="tier-rate">60</div>
+      <div class="tier-unit">requests / minute</div>
+      <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 12px;">Public API key. Read-only endpoints + intent submission.</p>
+    </div>
+    <div class="tier-card" style="border-color: rgba(99,102,241,0.3);">
+      <div class="tier-name" style="color: var(--primary-light);">Pro</div>
+      <div class="tier-rate">600</div>
+      <div class="tier-unit">requests / minute</div>
+      <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 12px;">Verified account. Priority WebSocket streams + batch analytics.</p>
+    </div>
+    <div class="tier-card" style="border-color: rgba(6,214,160,0.3);">
+      <div class="tier-name" style="color: var(--accent);">Solver</div>
+      <div class="tier-rate">6,000</div>
+      <div class="tier-unit">requests / minute</div>
+      <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 12px;">Staked solvers. Direct engine access + solution submission endpoint.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== 3. BECOME A SOLVER ===== -->
+<section id="solvers">
+<div class="container">
+  <div class="section-label reveal">Earn Fees</div>
+  <h2 class="reveal">Become a <span class="gradient">Solver</span></h2>
+  <p class="section-sub reveal">Solvers are the backbone of ARI. They compete in real-time to find the best execution routes for user intents.</p>
+
+  <div class="card-grid reveal">
+    <div class="card">
+      <div class="card-icon">&#9876;</div>
+      <h4>What Solvers Do</h4>
+      <p>Solvers receive encrypted intent batches, compute optimal fill routes across AMMs, bridges, and private liquidity, then submit solutions to the matching engine. The best solution wins the batch.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#9889;</div>
+      <h4>Dutch Auction Mechanism</h4>
+      <p>Each batch runs a Dutch auction: the price starts favorable for the solver and decays toward the user's limit. The first solver to submit a valid fill at the current price level wins. This incentivizes speed and price quality.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">&#128176;</div>
+      <h4>Reward Model</h4>
+      <p>Winning solvers earn <strong style="color: var(--accent);">80% of trade fees</strong> for each batch they settle. The remaining 20% goes to the protocol treasury and $ARI stakers. Top solvers can earn additional performance bonuses.</p>
+    </div>
+  </div>
+
+  <h3 style="font-size: 1.1rem; margin: 40px 0 16px;" class="reveal">How to Participate</h3>
+
+  <div class="reveal">
+    <div class="flow-step">
+      <div class="flow-num">1</div>
+      <div class="flow-content">
+        <h4>Stake 100,000 $ARI</h4>
+        <p>Solvers must stake a minimum of 100K $ARI tokens to the SolverRegistry contract. This stake acts as a performance bond and is slashable for malicious behavior (e.g., submitting invalid fills).</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">2</div>
+      <div class="flow-content">
+        <h4>Run the Solver Node</h4>
+        <p>Deploy <code style="color: var(--primary-light); background: var(--surface); padding: 2px 8px; border-radius: 4px;">ari-solver</code> on your infrastructure. The node connects to the solver network, receives batch data, and submits solutions.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">3</div>
+      <div class="flow-content">
+        <h4>Build Your Strategy</h4>
+        <p>Implement custom routing logic. Connect to on-chain AMMs, CEX APIs, private market makers, or cross-chain bridges. The solver SDK provides hooks for every step.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block reveal">
+    <span class="lang-tag">bash</span>
+<span class="c-comment"># Install and run the solver node</span>
+cargo install ari-solver
+
+<span class="c-comment"># Configure with your staking wallet and RPC endpoints</span>
+ari-solver init \
+  --private-key <span class="c-str">$SOLVER_PRIVATE_KEY</span> \
+  --rpc-ethereum <span class="c-str">$ETH_RPC_URL</span> \
+  --rpc-arbitrum <span class="c-str">$ARB_RPC_URL</span> \
+  --rpc-base <span class="c-str">$BASE_RPC_URL</span>
+
+<span class="c-comment"># Start solving</span>
+ari-solver run --strategy custom --log-level info
+  </div>
+</div>
+</section>
+
+<!-- ===== 4. SDK & TOOLS ===== -->
+<section id="sdk">
+<div class="container">
+  <div class="section-label reveal">Tooling</div>
+  <h2 class="reveal">SDK &amp; <span class="gradient">Tools</span></h2>
+  <p class="section-sub reveal">First-class support for Rust and TypeScript. Embed ARI swaps into any application.</p>
+
+  <div class="card-grid reveal">
+    <div class="card">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span class="tag tag-rust">Rust</span>
+        <h4 style="margin-bottom: 0;">ari-core</h4>
+      </div>
+      <p>Core types, intent validation, cryptographic primitives (threshold encryption, Poseidon hashing). The foundational crate used by all other ARI packages.</p>
+      <div class="code-block" style="margin-top: 12px;">
+        <span class="lang-tag">toml</span>
+[dependencies]
+ari-core = <span class="c-str">"0.1"</span>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span class="tag tag-rust">Rust</span>
+        <h4 style="margin-bottom: 0;">ari-solver</h4>
+      </div>
+      <p>Full solver node implementation. Includes batch listener, route optimizer, solution builder, and on-chain settlement submitter. Extensible via trait-based strategy hooks.</p>
+      <div class="code-block" style="margin-top: 12px;">
+        <span class="lang-tag">toml</span>
+[dependencies]
+ari-solver = <span class="c-str">"0.1"</span>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span class="tag tag-rust">Rust</span>
+        <h4 style="margin-bottom: 0;">ari-crypto</h4>
+      </div>
+      <p>Threshold encryption (BLS12-381), Poseidon hash, zero-knowledge proof generation for private settlement. Used by both solvers and the matching engine.</p>
+      <div class="code-block" style="margin-top: 12px;">
+        <span class="lang-tag">toml</span>
+[dependencies]
+ari-crypto = <span class="c-str">"0.1"</span>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span class="tag tag-ts">TypeScript</span>
+        <h4 style="margin-bottom: 0;">@ari-dex/sdk</h4>
+      </div>
+      <p>TypeScript SDK for browser and Node.js. Submit intents, stream market data, manage Permit2 signatures. Full type safety with auto-generated types from the Rust core.</p>
+      <div class="code-block" style="margin-top: 12px;">
+        <span class="lang-tag">bash</span>
+npm install <span class="c-str">@ari-dex/sdk</span>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span class="tag tag-ts">TypeScript</span>
+        <h4 style="margin-bottom: 0;">@ari-dex/react</h4>
+      </div>
+      <p>Drop-in React swap widget. Fully themed, responsive, wallet-aware (supports WalletConnect, MetaMask, Coinbase Wallet). Embed in 3 lines of code.</p>
+      <div class="code-block" style="margin-top: 12px;">
+        <span class="lang-tag">tsx</span>
+<span class="c-kw">import</span> { <span class="c-type">SwapWidget</span> } <span class="c-kw">from</span> <span class="c-str">'@ari-dex/react'</span>
+
+<span class="c-kw">export default</span> () =&gt; <span class="c-fn">&lt;</span><span class="c-type">SwapWidget</span> theme=<span class="c-str">"dark"</span> <span class="c-fn">/&gt;</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block reveal" style="margin-top: 32px;">
+    <span class="lang-tag">typescript</span>
+<span class="c-comment">// Full TypeScript SDK example</span>
+<span class="c-kw">import</span> { <span class="c-type">AriClient</span>, <span class="c-type">Intent</span> } <span class="c-kw">from</span> <span class="c-str">'@ari-dex/sdk'</span>
+
+<span class="c-kw">const</span> client = <span class="c-kw">new</span> <span class="c-type">AriClient</span>({ apiKey: process.env.<span class="c-type">ARI_API_KEY</span> })
+
+<span class="c-comment">// Get a quote</span>
+<span class="c-kw">const</span> quote = <span class="c-kw">await</span> client.<span class="c-fn">getQuote</span>({
+  sellToken: <span class="c-str">'ETH'</span>,
+  buyToken:  <span class="c-str">'USDC'</span>,
+  sellAmount: <span class="c-fn">parseEther</span>(<span class="c-str">'1.0'</span>),
+  sourceChain: <span class="c-str">'ethereum'</span>,
+})
+
+<span class="c-comment">// Submit an intent</span>
+<span class="c-kw">const</span> intent = <span class="c-kw">await</span> client.<span class="c-fn">submitIntent</span>({
+  sellToken:  quote.sellToken,
+  buyToken:   quote.buyToken,
+  sellAmount: quote.sellAmount,
+  minBuyAmount: quote.expectedOutput,
+  deadline:   Math.<span class="c-fn">floor</span>(Date.<span class="c-fn">now</span>() / <span class="c-type">1000</span>) + <span class="c-type">300</span>,
+  permit2Signature: <span class="c-kw">await</span> signer.<span class="c-fn">signPermit2</span>(quote.permit2Data),
+})
+
+<span class="c-comment">// Stream status updates</span>
+client.<span class="c-fn">onIntentUpdate</span>(intent.id, (status) =&gt; {
+  console.<span class="c-fn">log</span>(<span class="c-str">`Status: ${status.state}`</span>) <span class="c-comment">// pending → matched → settling → filled</span>
+})
+  </div>
+</div>
+</section>
+
+<!-- ===== 5. SMART CONTRACTS ===== -->
+<section id="contracts">
+<div class="container">
+  <div class="section-label reveal">On-Chain</div>
+  <h2 class="reveal">Smart <span class="gradient">Contracts</span></h2>
+  <p class="section-sub reveal">Minimal on-chain footprint. All complex logic runs off-chain in solvers; contracts only handle atomic settlement and liquidity custody.</p>
+
+  <div class="card-grid reveal">
+    <div class="card">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span class="tag tag-sol">Solidity</span>
+        <h4 style="margin-bottom: 0;">Settlement.sol</h4>
+      </div>
+      <p>Executes solver-submitted fills atomically. Uses <strong>Permit2</strong> for gasless token approvals. Verifies solver signatures, enforces deadline + slippage constraints, and distributes fees.</p>
+      <div style="margin-top: 12px; font-size: 0.82rem; color: var(--text-dim);">
+        <strong style="color: var(--text);">Key functions:</strong> <code style="color: var(--primary-light);">settle()</code>, <code style="color: var(--primary-light);">batchSettle()</code>, <code style="color: var(--primary-light);">cancelIntent()</code>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span class="tag tag-sol">Solidity</span>
+        <h4 style="margin-bottom: 0;">Vault.sol</h4>
+      </div>
+      <p>Concentrated Liquidity Market Maker (CLMM) vault. LP positions are represented as <strong>ERC-721 NFTs</strong>, each encoding a tick range and fee tier. Supports single-sided deposits and auto-compounding.</p>
+      <div style="margin-top: 12px; font-size: 0.82rem; color: var(--text-dim);">
+        <strong style="color: var(--text);">Key functions:</strong> <code style="color: var(--primary-light);">mint()</code>, <code style="color: var(--primary-light);">burn()</code>, <code style="color: var(--primary-light);">collect()</code>, <code style="color: var(--primary-light);">rebalance()</code>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span class="tag tag-sol">Solidity</span>
+        <h4 style="margin-bottom: 0;">SolverRegistry.sol</h4>
+      </div>
+      <p>Manages solver staking, slashing, and reputation scores. Solvers must maintain a minimum 100K $ARI stake. Slashing conditions: invalid fills, timeout violations, or provable collusion.</p>
+      <div style="margin-top: 12px; font-size: 0.82rem; color: var(--text-dim);">
+        <strong style="color: var(--text);">Key functions:</strong> <code style="color: var(--primary-light);">register()</code>, <code style="color: var(--primary-light);">slash()</code>, <code style="color: var(--primary-light);">withdraw()</code>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-size: 1.1rem; margin: 40px 0 16px;" class="reveal">Deployed Networks</h3>
+  <div class="reveal">
+    <table>
+      <thead>
+        <tr><th>Network</th><th>Settlement</th><th>Vault</th><th>SolverRegistry</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color: var(--text);">Ethereum Mainnet</td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">TBD</td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">TBD</td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">TBD</td>
+        </tr>
+        <tr>
+          <td style="color: var(--text);">Arbitrum One</td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">TBD</td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">TBD</td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">TBD</td>
+        </tr>
+        <tr>
+          <td style="color: var(--text);">Base</td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">TBD</td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">TBD</td>
+          <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">TBD</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="color: var(--text-dim); font-size: 0.82rem; margin-top: 8px;">Contract addresses will be published upon testnet deployment.</p>
+  </div>
+</div>
+</section>
+
+<!-- ===== 6. INTENT SCHEMA ===== -->
+<section id="intent-schema">
+<div class="container">
+  <div class="section-label reveal">Data Model</div>
+  <h2 class="reveal">Intent <span class="gradient">Schema</span></h2>
+  <p class="section-sub reveal">The canonical Rust type representing a user intent. This is the core data structure that flows through every layer of the stack.</p>
+
+  <div class="code-block reveal">
+    <span class="lang-tag">rust</span>
+<span class="c-kw">use</span> <span class="c-type">ethers</span>::types::{<span class="c-type">Address</span>, <span class="c-type">U256</span>, <span class="c-type">Bytes</span>};
+<span class="c-kw">use</span> <span class="c-type">serde</span>::{<span class="c-type">Serialize</span>, <span class="c-type">Deserialize</span>};
+
+<span class="c-comment">/// A user's trade intent — the atomic unit of the ARI protocol.</span>
+<span class="c-comment">/// Intents are encrypted before entering the mempool and only</span>
+<span class="c-comment">/// revealed via threshold decryption at batch settlement time.</span>
+#[<span class="c-fn">derive</span>(<span class="c-type">Debug</span>, <span class="c-type">Clone</span>, <span class="c-type">Serialize</span>, <span class="c-type">Deserialize</span>)]
+<span class="c-kw">pub struct</span> <span class="c-type">Intent</span> {
+    <span class="c-comment">/// Unique intent identifier (keccak256 hash of fields)</span>
+    <span class="c-kw">pub</span> id: [<span class="c-type">u8</span>; <span class="c-type">32</span>],
+
+    <span class="c-comment">/// The user's wallet address (signer)</span>
+    <span class="c-kw">pub</span> user: <span class="c-type">Address</span>,
+
+    <span class="c-comment">/// Token being sold</span>
+    <span class="c-kw">pub</span> sell_token: <span class="c-type">Address</span>,
+
+    <span class="c-comment">/// Token being bought</span>
+    <span class="c-kw">pub</span> buy_token: <span class="c-type">Address</span>,
+
+    <span class="c-comment">/// Exact amount of sell_token to spend (in wei)</span>
+    <span class="c-kw">pub</span> sell_amount: <span class="c-type">U256</span>,
+
+    <span class="c-comment">/// Minimum acceptable buy_token received (slippage protection)</span>
+    <span class="c-kw">pub</span> min_buy_amount: <span class="c-type">U256</span>,
+
+    <span class="c-comment">/// Source chain ID (e.g., 1 = Ethereum, 42161 = Arbitrum)</span>
+    <span class="c-kw">pub</span> source_chain: <span class="c-type">u64</span>,
+
+    <span class="c-comment">/// Destination chain ID (can differ from source for cross-chain)</span>
+    <span class="c-kw">pub</span> dest_chain: <span class="c-type">u64</span>,
+
+    <span class="c-comment">/// Unix timestamp — intent expires after this time</span>
+    <span class="c-kw">pub</span> deadline: <span class="c-type">u64</span>,
+
+    <span class="c-comment">/// Nonce to prevent replay attacks</span>
+    <span class="c-kw">pub</span> nonce: <span class="c-type">u64</span>,
+
+    <span class="c-comment">/// Intent type: Swap, LimitOrder, TWAP, or DCA</span>
+    <span class="c-kw">pub</span> intent_type: <span class="c-type">IntentType</span>,
+
+    <span class="c-comment">/// Permit2 signature for gasless token approval</span>
+    <span class="c-kw">pub</span> permit2_signature: <span class="c-type">Bytes</span>,
+
+    <span class="c-comment">/// Threshold-encrypted payload (decrypted only at batch time)</span>
+    <span class="c-kw">pub</span> encrypted_payload: <span class="c-type">Option</span>&lt;<span class="c-type">Bytes</span>&gt;,
+}
+
+#[<span class="c-fn">derive</span>(<span class="c-type">Debug</span>, <span class="c-type">Clone</span>, <span class="c-type">Serialize</span>, <span class="c-type">Deserialize</span>)]
+<span class="c-kw">pub enum</span> <span class="c-type">IntentType</span> {
+    <span class="c-comment">/// Market swap — fill at best available price</span>
+    <span class="c-type">Swap</span>,
+    <span class="c-comment">/// Limit order — fill only at specified price or better</span>
+    <span class="c-type">LimitOrder</span> { limit_price: <span class="c-type">U256</span> },
+    <span class="c-comment">/// Time-weighted average price over N batches</span>
+    <span class="c-type">TWAP</span> { num_batches: <span class="c-type">u32</span>, interval_secs: <span class="c-type">u64</span> },
+    <span class="c-comment">/// Dollar-cost averaging over a schedule</span>
+    <span class="c-type">DCA</span> { frequency_secs: <span class="c-type">u64</span>, total_epochs: <span class="c-type">u32</span> },
+}
+
+#[<span class="c-fn">derive</span>(<span class="c-type">Debug</span>, <span class="c-type">Clone</span>, <span class="c-type">Serialize</span>, <span class="c-type">Deserialize</span>)]
+<span class="c-kw">pub enum</span> <span class="c-type">IntentStatus</span> {
+    <span class="c-type">Pending</span>,      <span class="c-comment">// Submitted, awaiting batch inclusion</span>
+    <span class="c-type">Encrypted</span>,    <span class="c-comment">// In encrypted mempool</span>
+    <span class="c-type">Matched</span>,      <span class="c-comment">// Solver found a fill route</span>
+    <span class="c-type">Settling</span>,     <span class="c-comment">// On-chain settlement tx submitted</span>
+    <span class="c-type">Filled</span>,       <span class="c-comment">// Successfully settled</span>
+    <span class="c-type">Expired</span>,      <span class="c-comment">// Deadline passed without fill</span>
+    <span class="c-type">Cancelled</span>,    <span class="c-comment">// User cancelled before batch close</span>
+}
+  </div>
+</div>
+</section>
+
+<!-- ===== 7. GITHUB ===== -->
+<section id="github">
+<div class="container" style="text-align: center;">
+  <div class="section-label reveal">Open Source</div>
+  <h2 class="reveal">Build with <span class="gradient">ARI</span></h2>
+  <p style="color: var(--text-dim); margin-bottom: 32px; font-size: 0.95rem;" class="reveal">ARI is open source. Explore the codebase, submit issues, or contribute directly.</p>
+
+  <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;" class="reveal">
+    <a href="https://github.com/yukihamada/ari-dex" target="_blank" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub Repository
+    </a>
+    <a href="index.html" class="btn btn-outline">Back to Home</a>
+  </div>
+
+  <div class="metric-grid reveal" style="margin-top: 40px; max-width: 700px; margin-left: auto; margin-right: auto;">
+    <div class="metric">
+      <div class="metric-value" style="font-size: 1.6rem;">MIT</div>
+      <div class="metric-label">License</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value" style="font-size: 1.6rem;">Rust</div>
+      <div class="metric-label">Primary Language</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value" style="font-size: 1.6rem;">5</div>
+      <div class="metric-label">Crates</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-logo">ARI</div>
+    <p>Intent-Based DEX with MEV Protection</p>
+    <p style="margin-top: 16px;">
+      <a href="https://github.com/yukihamada/ari-dex" target="_blank">GitHub</a>
+      &nbsp;&middot;&nbsp;
+      <a href="index.html">Home</a>
+      &nbsp;&middot;&nbsp;
+      Built with Claude Code (Opus 4.6)
+    </p>
+    <p style="margin-top: 12px; font-size: 0.75rem;">ARI &mdash; Arithmetic of Intents &middot; 2026</p>
+  </div>
+</footer>
+
+<!-- ===== REVEAL ANIMATION ===== -->
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
