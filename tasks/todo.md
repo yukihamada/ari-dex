@@ -2,55 +2,69 @@
 
 ## 完了済み
 
+### 基盤
 - [x] DEX仕様策定 — 13セクション、EN/JP 5ページ、OGP
 - [x] 競合調査 — CoW Protocol, UniswapX, 1inch Fusion, Anoma, SUAVE, Across, Essential
 - [x] ブランディング — ARI (Arithmetic of Intents)、ダークテーマ、パーティクルエフェクト
-- [x] Rust workspace (6 crates) — cargo build --release passing
-- [x] APIサーバー — 8 endpoints returning real JSON (axum, tower-http)
-- [x] マッチングエンジン — CLMM + OrderBook + BatchAuction + HybridRouter (compiled)
-- [x] Smart Contracts — Settlement.sol, Vault.sol, VaultFactory.sol, SolverRegistry.sol
-- [x] Foundryテスト — 32テスト全パス (Settlement 14 + SolverRegistry 18)
-- [x] Swap UI — React + Vite + wagmi、API接続、デモモード
-- [x] Frontend + API単一サーバー配信 (tower-http ServeDir)
-- [x] デプロイスクリプト — Deploy.s.sol (任意EVMチェーン)
 - [x] GitHub — yukihamada/ari-dex + enablerdao/ari-dex
-- [x] Fly.ioデプロイ — dex-spec.fly.dev (仕様サイト)
 - [x] 日本語メイン化 — root=JA、en/=EN
+
+### Rust (6 crates)
+- [x] ari-core — 型定義、プロトコル定義
+- [x] ari-crypto — AES-256-GCM + Shamir SSS 暗号化メモプール
+- [x] ari-engine — CLMM (Q64.96), バッチオークション, ハイブリッドルーター
+- [x] ari-gateway — 8+ REST API + WebSocket (axum 0.7)
+- [x] ari-solver — Dijkstraルーティング, Dutchオークション, スコアリング
+- [x] ari-node — サーバーバイナリ
+- [x] セキュリティ強化 — CORS制限, 同時接続制限, tokio::Mutex, 入力バリデーション, WS制限
+
+### Smart Contracts (13)
+- [x] Settlement.sol — EIP-712署名検証
+- [x] Vault.sol — CLMM + ERC-721 LP NFT + リエントランシーガード
+- [x] VaultFactory.sol — EIP-1167 minimal proxy
+- [x] SolverRegistry.sol — 100K $ARI ステーク + スラッシング
+- [x] AriToken.sol — ERC-20 (1B cap)
+- [x] VeARI.sol — 1-4年ロック、線形減衰
+- [x] ConditionalIntent.sol — Limit / Stop Loss / Take Profit / DCA
+- [x] PerpetualMarket.sol — 20x レバレッジ
+- [x] CrossChainIntent.sol — ERC-7683 + エスクロー
+- [x] IntentComposer.sol — アトミック複合インテント
+- [x] PrivatePool.sol — ホワイトリストAMM
+- [x] AriPaymaster.sol — ERC-4337 ガスレス
+- [x] SimplePriceOracle.sol — 価格オラクル
+- [x] Foundry 188テスト全パス
+- [x] SafeERC20 全コントラクト適用
+
+### Frontend
+- [x] SwapPanel — React + Vite + wagmi
+- [x] EIP-712 署名フロー (useSignIntent)
+- [x] デモモード (dev only)
+- [x] セキュリティ — HTTPS強制、入力バリデーション
+
+### デプロイ
+- [x] Ethereum メインネット — 全13コントラクト
+- [x] Sourcify verify — Settlement (exact match)
+- [x] API サーバー — ari-dex-api.fly.dev
+- [x] Spec サイト — dex-spec.fly.dev
+- [x] CI/CD — GitHub Actions (Rust + Foundry + Frontend)
 
 ---
 
-## Phase 1 — MVP（テストネットデモ）
+## 残タスク
 
-- [ ] Sepolia / Base Sepoliaにコントラクトデプロイ
-- [ ] APIサーバーをFly.ioにデプロイ（ari-dex-api.fly.dev）
-- [ ] ウォレット署名フロー（MetaMask → EIP-712 → Intent → Settlement）
-- [ ] リアル価格取得 — Uniswap V3 / Chainlinkオラクル連携
-- [ ] Intent永続化 — SQLite（インメモリから移行）
-- [ ] Vault.sol テスト追加（CLMM + ERC-721 LP NFT）
-- [ ] VaultFactory.sol テスト追加
+### Phase 3 — プロダクション拡張
+- [ ] Sourcify/Etherscan 全コントラクト verify（実行中）
+- [ ] Arbitrum / Base マルチチェーンデプロイ
+- [ ] Chainlink オラクル連携（モック価格 → リアル価格）
+- [ ] 外部セキュリティ監査
+- [ ] BLS署名 本番実装（現在HMAC placeholder）
 
-## Phase 2 — コアプロトコル
-
-- [ ] Solver Network — 外部ソルバーのインテント取得・競争入札
-- [ ] 暗号化メモプール — BLS閾値暗号（MEV保護、型のみ→実装）
-- [ ] バッチオークション — 250msリアルタイムスケジューリング
-- [ ] CLMM数学実装 — sqrt price、tick bitmap、swap/mint/burn
-- [ ] ガスレス取引 — ERC-4337 Account Abstraction
-- [ ] WebSocket — リアルタイム価格フィード、オーダーブック更新
-- [ ] クロスチェーンインテント — ERC-7683 (Solana bridging)
-
-## Phase 3 — プロダクション
-
-- [ ] セキュリティ監査（外部3社）
-- [ ] Ethereum / Arbitrum / Base メインネットデプロイ
-- [ ] ZK-Rollup決済 — L1証明提出
-- [ ] $ARI トークン発行 — Work Token + veARI ガバナンス
-- [ ] Buyback & Make プログラム
-
-## インフラ / DevOps
-
-- [ ] CI/CD — GitHub Actions（Rust test + Foundry test + Frontend build）
+### インフラ
 - [ ] モニタリング — Prometheus + Grafana
-- [ ] ドキュメント — SDK / APIリファレンス / Solver開発ガイド
-- [ ] ロードバランサー / CDN設定
-- [ ] バグバウンティプログラム立ち上げ
+- [ ] CDN / ロードバランサー設定
+- [ ] バグバウンティプログラム
+
+### ドキュメント
+- [ ] SDK / API リファレンス
+- [ ] Solver 開発ガイド
+- [ ] ホワイトペーパー（LaTeX）
