@@ -84,7 +84,11 @@ async fn refresh_prices() {
         ids
     );
 
-    let resp = match reqwest::get(&url).await {
+    let client = reqwest::Client::builder()
+        .user_agent("ARI-DEX/0.1")
+        .build()
+        .unwrap_or_default();
+    let resp = match client.get(&url).send().await {
         Ok(r) => r,
         Err(e) => {
             tracing::warn!("CoinGecko fetch failed: {e}");

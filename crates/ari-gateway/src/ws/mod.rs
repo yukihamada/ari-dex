@@ -72,7 +72,11 @@ pub fn spawn_price_ticker(tx: broadcast::Sender<BroadcastEvent>) {
 
             // Fetch live prices from CoinGecko
             let url = "https://api.coingecko.com/api/v3/simple/price?ids=ethereum,wrapped-bitcoin&vs_currencies=usd";
-            let prices = match reqwest::get(url).await {
+            let client = reqwest::Client::builder()
+                .user_agent("ARI-DEX/0.1")
+                .build()
+                .unwrap_or_default();
+            let prices = match client.get(url).send().await {
                 Ok(resp) => resp
                     .json::<std::collections::HashMap<String, std::collections::HashMap<String, f64>>>()
                     .await
