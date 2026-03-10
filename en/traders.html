@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARI — トレーダー向け</title>
+<title>ARI — For Traders</title>
 
 <!-- OGP -->
-<meta property="og:title" content="ARI — トレーダー向け">
-<meta property="og:description" content="どのチェーンでもガス代ゼロ、MEV対策、最安価格で自動的にトレード。">
+<meta property="og:title" content="ARI — For Traders">
+<meta property="og:description" content="Trade on any chain with zero gas fees, MEV protection, and the best prices — automatically.">
 <meta property="og:type" content="website">
 
 <style>
@@ -481,22 +481,22 @@
 <nav>
   <div class="container">
     <a href="index.html" class="nav-logo">ARI</a>
-    <a href="#problem">問題点</a>
-    <a href="#protection">保護機能</a>
-    <a href="#best-price">最安価格</a>
-    <a href="#zero-gas">ガス代ゼロ</a>
-    <a href="#how-it-works">使い方</a>
-    <a href="#compare">比較</a>
-    <a href="en/traders.html" style="margin-left: auto; font-weight: 600;">EN</a>
+    <a href="#problem">The Problem</a>
+    <a href="#protection">Protection</a>
+    <a href="#best-price">Best Price</a>
+    <a href="#zero-gas">Zero Gas</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="#compare">Compare</a>
+    <a href="../traders.html" style="margin-left: auto; border: 1px solid var(--border); color: var(--text);">JP</a>
   </div>
 </nav>
 
 <!-- ===== HERO ===== -->
 <div class="hero">
   <div class="hero-content">
-    <div class="hero-badge">トレーダーのために作りました</div>
-    <h1>トレーダー向け</h1>
-    <p>見えないBotにお金を取られるのはもう終わり。ARIなら、どのチェーンでも最安価格でガス代ゼロのトレードができます。</p>
+    <div class="hero-badge">Built for Traders</div>
+    <h1>For Traders</h1>
+    <p>Stop losing money to invisible bots. ARI gives you the best price, on any chain, with zero gas fees.</p>
   </div>
 </div>
 
@@ -504,46 +504,46 @@
 <section id="problem">
   <div class="container">
     <div class="reveal">
-      <div class="section-label">今起きている問題</div>
-      <h2>あなたはトレードのたびに<span class="gradient">損をしています</span></h2>
-      <p class="section-sub">しかも、ほとんどの人は気づいていません。</p>
+      <div class="section-label">The Problem Today</div>
+      <h2>You're Being <span class="gradient">Robbed</span> Every Time You Trade</h2>
+      <p class="section-sub">And you probably don't even know it.</p>
     </div>
 
     <div class="problem-box reveal">
-      <h3>実際に何が起きているの?</h3>
-      <p>普通のDEXでスワップを出すと、あなたの注文は処理されるまで「mempool」という公開の待機場所に置かれます。そのほんの一瞬の間に、自動化されたBotがあなたの注文内容を見ることができるんです。</p>
-      <p>Botはあなたより先にトークンを買い、価格をつり上げてから、あなたが買った直後に売り抜けます。その差額がBotの利益になります。これを<strong style="color: var(--text);">サンドイッチ攻撃</strong>と言います。</p>
-      <p>イメージとしては、お店のセールで誰かが割り込んでお得な商品を全部買い占め、それをあなたに高い値段で売りつけるようなものです。</p>
+      <h3>What's actually happening?</h3>
+      <p>When you submit a swap on a regular DEX, your order sits in a public waiting room (called a "mempool") before it gets processed. During that brief moment, automated bots can see exactly what you're about to do.</p>
+      <p>These bots jump in front of your trade, buy the token before you, push the price up, then sell right after you buy — pocketing the difference. This is called a <strong style="color: var(--text);">sandwich attack</strong>.</p>
+      <p>Think of it like someone cutting in line at a store, buying up all the discounted items, then reselling them to you at a higher price.</p>
     </div>
 
     <div class="sandwich-visual reveal">
-      <div style="color: var(--text-dim); margin-bottom: 12px; font-family: Inter, sans-serif; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px;">サンドイッチ攻撃の仕組み:</div>
+      <div style="color: var(--text-dim); margin-bottom: 12px; font-family: Inter, sans-serif; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px;">How a sandwich attack works:</div>
       <div class="tx-line tx-bot">
         <span class="tx-label">BOT</span>
-        <span>先にETHを買い、価格をつり上げる</span>
+        <span>Buys ETH first, pushing the price up</span>
       </div>
       <div class="tx-line tx-you">
-        <span class="tx-label">あなた</span>
-        <span>高くなった価格でスワップが実行される</span>
+        <span class="tx-label">YOU</span>
+        <span>Your swap goes through at a worse price</span>
       </div>
       <div class="tx-line tx-bot">
         <span class="tx-label">BOT</span>
-        <span>あなたの直後にETHを売り、利益を確定</span>
+        <span>Sells ETH right after you, taking the profit</span>
       </div>
     </div>
 
     <div class="metric-grid reveal">
       <div class="metric">
-        <div class="metric-value" style="-webkit-text-fill-color: unset; background: none; color: var(--danger);">9億ドル以上</div>
-        <div class="metric-label">2025年にMEVで失われた金額</div>
+        <div class="metric-value" style="-webkit-text-fill-color: unset; background: none; color: var(--danger);">$900M+</div>
+        <div class="metric-label">Lost by traders to MEV in 2025</div>
       </div>
       <div class="metric">
-        <div class="metric-value" style="-webkit-text-fill-color: unset; background: none; color: var(--danger);">12秒ごと</div>
-        <div class="metric-label">サンドイッチ攻撃が発生</div>
+        <div class="metric-value" style="-webkit-text-fill-color: unset; background: none; color: var(--danger);">Every 12 sec</div>
+        <div class="metric-label">A sandwich attack happens</div>
       </div>
       <div class="metric">
         <div class="metric-value" style="-webkit-text-fill-color: unset; background: none; color: var(--warning);">$5-50</div>
-        <div class="metric-label">1回のスワップあたりの平均損失</div>
+        <div class="metric-label">Average loss per swap</div>
       </div>
     </div>
   </div>
@@ -553,32 +553,32 @@
 <section id="protection">
   <div class="container">
     <div class="reveal">
-      <div class="section-label">ARIの保護機能</div>
-      <h2>あなたのトレードはBotから<span class="gradient">完全に見えません</span></h2>
-      <p class="section-sub">3つの保護レイヤーが連携して守ります。</p>
+      <div class="section-label">How ARI Protects You</div>
+      <h2>Your Trades Are <span class="gradient">Invisible</span> to Bots</h2>
+      <p class="section-sub">Three layers of protection, working together.</p>
     </div>
 
     <div class="protect-card reveal">
       <div class="protect-icon">&#128274;</div>
       <div>
-        <h4>注文は暗号化されます</h4>
-        <p>ARIでトレードを出すと、すぐに暗号化されます。Bot、バリデーター、そして私たちでさえ、処理が完了するまで注文の中身を見ることはできません。見えないものを先回りすることはできないですよね。</p>
+        <h4>Your Order Is Encrypted</h4>
+        <p>When you submit a trade on ARI, it's immediately encrypted. Nobody — not bots, not validators, not even us — can see your order details until it's been processed. Bots can't front-run what they can't see.</p>
       </div>
     </div>
 
     <div class="protect-card reveal">
       <div class="protect-icon">&#9878;</div>
       <div>
-        <h4>みんなに公平な価格</h4>
-        <p>ARIは250ミリ秒の間に届いた注文をまとめて、一括で処理します。同じバッチ内の注文はすべて同じ公平な価格になります。「割り込む列」自体が存在しないので、誰も先回りできません。</p>
+        <h4>Fair Price for Everyone</h4>
+        <p>ARI collects all orders within a 250-millisecond window and processes them as a batch. Every order in that batch gets the same fair price. No one can jump ahead of you because there's no "line" to cut.</p>
       </div>
     </div>
 
     <div class="protect-card reveal">
       <div class="protect-icon">&#128176;</div>
       <div>
-        <h4>MEVの80%があなたに還元</h4>
-        <p>すべての保護を行った後でも、通常Botに取られるはずの価値(MEV)が残った場合、ARIはそれを回収して80%をあなたに直接戻します。今まで奪われていたお金が、あなたのものになります。</p>
+        <h4>80% MEV Returned to You</h4>
+        <p>Even after all protections, if there's any remaining value that would normally go to bots (called MEV), ARI captures it and returns 80% directly back to you. You keep the money that used to be stolen.</p>
       </div>
     </div>
   </div>
@@ -588,26 +588,26 @@
 <section id="best-price">
   <div class="container">
     <div class="reveal">
-      <div class="section-label">最安価格、どのチェーンでも</div>
-      <h2>1回のスワップで<span class="gradient">全チェーン対応</span></h2>
-      <p class="section-sub">やりたいことを入力するだけ。あとはARIにおまかせ。</p>
+      <div class="section-label">Best Price, Any Chain</div>
+      <h2>One Swap. <span class="gradient">Every Chain.</span></h2>
+      <p class="section-sub">You just say what you want. ARI handles the rest.</p>
     </div>
 
     <div class="card-grid reveal">
       <div class="card">
         <div class="card-icon">&#127758;</div>
-        <h4>クロスチェーンも自動で</h4>
-        <p>EthereumのETHをArbitrumのUSDCに交換したい? そのまま入力するだけでOKです。ARIのソルバーネットワークが、すべての主要チェーンとDEXから最安レートを見つけます。ブリッジの手動操作やネットワーク切り替えは不要です。</p>
+        <h4>Cross-Chain, Automatically</h4>
+        <p>Want to swap ETH on Ethereum for USDC on Arbitrum? Just enter the trade. ARI's solver network searches across all major chains and DEXs to find you the absolute best rate. No manual bridging, no switching networks.</p>
       </div>
       <div class="card">
         <div class="card-icon">&#128161;</div>
-        <h4>ソルバーがあなたのために競争</h4>
-        <p>複数のソルバーが最安価格であなたの注文を処理しようと競い合います。ソルバー同士が競争するから、得をするのはいつもあなた。何十人ものブローカーがあなたのために最高の取引を探してくれるイメージです。</p>
+        <h4>Solvers Compete For You</h4>
+        <p>Multiple solvers race to fill your order at the best price. They compete against each other — which means you always win. Think of it like having dozens of brokers fighting to get you the best deal.</p>
       </div>
       <div class="card">
         <div class="card-icon">&#9889;</div>
-        <h4>300ミリ秒以内</h4>
-        <p>「スワップ」をクリックしてからトレードが完了するまで、わずか300ミリ秒以内。まばたきよりも速いです。</p>
+        <h4>Under 300ms</h4>
+        <p>The entire process — from you clicking "swap" to your trade being filled — takes less than 300 milliseconds. That's faster than you can blink.</p>
       </div>
     </div>
   </div>
@@ -617,21 +617,21 @@
 <section id="zero-gas">
   <div class="container">
     <div class="reveal">
-      <div class="section-label">ガス代ゼロ</div>
-      <h2>ガス用のETHがない?<span class="gradient">問題なし。</span></h2>
-      <p class="section-sub">もうガス代の心配は不要です。</p>
+      <div class="section-label">Zero Gas Fees</div>
+      <h2>No ETH for Gas? <span class="gradient">No Problem.</span></h2>
+      <p class="section-sub">Trade without worrying about gas fees ever again.</p>
     </div>
 
     <div class="card-grid reveal">
       <div class="card">
         <div class="card-icon">&#9981;</div>
-        <h4>ガスレス・トレード</h4>
-        <p>ARIは「アカウント・アブストラクション」という技術を使っているので、ガス代を自分で払う必要はありません。トレードのためだけにウォレットにETHを入れておく必要も、ガス切れで取引が失敗することもなくなります。</p>
+        <h4>Gasless Trading</h4>
+        <p>ARI uses a technology called "account abstraction" so you never have to pay gas fees yourself. No more keeping ETH in your wallet just to make trades. No more failed transactions because gas ran out.</p>
       </div>
       <div class="card">
         <div class="card-icon">&#128179;</div>
-        <h4>つなげてすぐトレード</h4>
-        <p>売りたいトークンを持っていれば、それだけでOK。ガスの処理はARIが裏側でやります。Binanceのように簡単、でも完全に分散型で、秘密鍵はあなた自身が管理します。</p>
+        <h4>Just Connect and Trade</h4>
+        <p>If you have the token you want to sell, that's all you need. ARI handles the gas behind the scenes. It's as simple as trading on Binance — but fully decentralized, and you keep your own keys.</p>
       </div>
     </div>
   </div>
@@ -641,28 +641,28 @@
 <section id="how-it-works">
   <div class="container">
     <div class="reveal">
-      <div class="section-label">使い方</div>
-      <h2>かんたん<span class="gradient">3ステップ</span></h2>
-      <p class="section-sub">中央集権型の取引所と同じくらい簡単。いや、もっと簡単です。</p>
+      <div class="section-label">How It Works</div>
+      <h2>Three Simple <span class="gradient">Steps</span></h2>
+      <p class="section-sub">As easy as any centralized exchange. Easier, actually.</p>
     </div>
 
     <div class="steps-container reveal">
       <div class="step-card">
         <div class="step-num">1</div>
-        <h4>ウォレットを接続</h4>
-        <p>MetaMask、Rabbyなど、お好きなウォレットを接続。あなたの鍵、あなたの暗号資産 &#8212; いつでも。</p>
+        <h4>Connect Wallet</h4>
+        <p>Connect your MetaMask, Rabby, or any wallet. Your keys, your crypto — always.</p>
       </div>
       <div class="step-arrow">&#8594;</div>
       <div class="step-card">
         <div class="step-num">2</div>
-        <h4>スワップを入力</h4>
-        <p>トークンと金額を選ぶだけ。例えば「1 ETHをUSDCに」。これだけです。</p>
+        <h4>Enter Your Swap</h4>
+        <p>Pick the tokens and amount. For example: "1 ETH to USDC." That's it.</p>
       </div>
       <div class="step-arrow">&#8594;</div>
       <div class="step-card">
         <div class="step-num">3</div>
-        <h4>最安価格でトレード</h4>
-        <p>ARIのソルバーが全チェーンから最安価格を見つけます。あなたのトレードは保護され、300ミリ秒以内に完了します。</p>
+        <h4>Get the Best Price</h4>
+        <p>ARI's solvers find the best price across all chains. Your trade is protected and filled in under 300ms.</p>
       </div>
     </div>
   </div>
@@ -672,50 +672,50 @@
 <section id="compare">
   <div class="container">
     <div class="reveal">
-      <div class="section-label">比較表</div>
-      <h2>従来のDEX vs <span class="gradient">ARI</span></h2>
-      <p class="section-sub">違いは一目瞭然です。</p>
+      <div class="section-label">Side by Side</div>
+      <h2>Traditional DEX vs <span class="gradient">ARI</span></h2>
+      <p class="section-sub">See the difference.</p>
     </div>
 
     <div class="table-wrap reveal">
       <table>
         <thead>
           <tr>
-            <th>機能</th>
-            <th>従来のDEX</th>
+            <th>Feature</th>
+            <th>Traditional DEX</th>
             <th>ARI</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td style="color: var(--text); font-weight: 600;">MEV対策</td>
-            <td class="compare-bad">なし &#8212; Botに注文が丸見え</td>
-            <td class="compare-good">完全対応 &#8212; 注文は暗号化・バッチ処理</td>
+            <td style="color: var(--text); font-weight: 600;">MEV Protection</td>
+            <td class="compare-bad">None — bots can see and front-run your orders</td>
+            <td class="compare-good">Full — orders are encrypted and batched</td>
           </tr>
           <tr>
-            <td style="color: var(--text); font-weight: 600;">ガス代</td>
-            <td class="compare-bad">1回あたり$2-50以上</td>
-            <td class="compare-good">ガス代ゼロ</td>
+            <td style="color: var(--text); font-weight: 600;">Gas Fees</td>
+            <td class="compare-bad">You pay $2-50+ per transaction</td>
+            <td class="compare-good">Zero gas fees</td>
           </tr>
           <tr>
-            <td style="color: var(--text); font-weight: 600;">速度</td>
-            <td class="compare-bad">12-60秒(またはそれ以上)</td>
-            <td class="compare-good">300ミリ秒以内</td>
+            <td style="color: var(--text); font-weight: 600;">Speed</td>
+            <td class="compare-bad">12-60 seconds (or more)</td>
+            <td class="compare-good">Under 300 milliseconds</td>
           </tr>
           <tr>
-            <td style="color: var(--text); font-weight: 600;">クロスチェーン</td>
-            <td class="compare-bad">手動ブリッジ(遅い、リスクあり、高い)</td>
-            <td class="compare-good">自動 &#8212; ワンクリックでどのチェーンにも</td>
+            <td style="color: var(--text); font-weight: 600;">Cross-Chain</td>
+            <td class="compare-bad">Manual bridges (slow, risky, expensive)</td>
+            <td class="compare-good">Automatic — one click, any chain</td>
           </tr>
           <tr>
-            <td style="color: var(--text); font-weight: 600;">価格</td>
-            <td class="compare-bad">1つのDEX、1つのチェーンだけ</td>
-            <td class="compare-good">全DEX・全チェーンから最安価格を検索</td>
+            <td style="color: var(--text); font-weight: 600;">Price</td>
+            <td class="compare-bad">One DEX, one chain</td>
+            <td class="compare-good">Best price found across all DEXs and chains</td>
           </tr>
           <tr>
-            <td style="color: var(--text); font-weight: 600;">MEV還元</td>
-            <td class="compare-bad">なし &#8212; Botが全部取る</td>
-            <td class="compare-good">80%をあなたに還元</td>
+            <td style="color: var(--text); font-weight: 600;">MEV Rebate</td>
+            <td class="compare-bad">None — bots keep everything</td>
+            <td class="compare-good">80% returned to you</td>
           </tr>
         </tbody>
       </table>
@@ -726,11 +726,11 @@
 <!-- ===== CTA ===== -->
 <section class="cta-section">
   <div class="container reveal">
-    <h2>フェアな<span class="gradient">トレード</span>を始めよう</h2>
-    <p>Botなし。ガス代なし。ブリッジなし。いつでも最安価格。</p>
+    <h2><span class="gradient">Start Trading</span> the Fair Way</h2>
+    <p>No bots. No gas fees. No bridges. Just the best price, always.</p>
     <div class="cta-buttons">
-      <a href="#" class="btn btn-primary btn-lg" onclick="event.preventDefault();">トレードを始める</a>
-      <a href="index.html" class="btn btn-outline btn-lg">技術仕様を読む</a>
+      <a href="#" class="btn btn-primary btn-lg" onclick="event.preventDefault();">Start Trading</a>
+      <a href="index.html" class="btn btn-outline btn-lg">Read the Spec</a>
     </div>
     <div class="coming-soon">Coming Soon</div>
   </div>
@@ -742,7 +742,7 @@
     <div class="footer-logo">ARI</div>
     <p>Arithmetic of Intents</p>
     <p style="margin-top: 16px;">
-      <a href="index.html">技術仕様</a>
+      <a href="index.html">Technical Spec</a>
     </p>
     <p style="margin-top: 12px; font-size: 0.75rem;">ARI &mdash; Arithmetic of Intents &middot; 2026</p>
   </div>

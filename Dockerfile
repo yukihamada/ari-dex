@@ -4,6 +4,7 @@ COPY investors.html /usr/share/nginx/html/investors.html
 COPY developers.html /usr/share/nginx/html/developers.html
 COPY traders.html /usr/share/nginx/html/traders.html
 COPY liquidity.html /usr/share/nginx/html/liquidity.html
+COPY en/ /usr/share/nginx/html/en/
 COPY ja/ /usr/share/nginx/html/ja/
 COPY og.png /usr/share/nginx/html/og.png
 EXPOSE 8080

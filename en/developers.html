@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARI — 開発者 & Solver</title>
+<title>ARI — Developers & Solvers</title>
 
 <!-- OGP -->
-<meta property="og:title" content="ARI — 開発者 & Solver向け">
-<meta property="og:description" content="ARI DEX上で構築しよう。アーキテクチャ、APIリファレンス、Solverガイド、SDK、スマートコントラクトドキュメント。">
+<meta property="og:title" content="ARI — For Developers & Solvers">
+<meta property="og:description" content="Build on ARI DEX. Architecture, API reference, Solver guide, SDKs, and smart contract docs.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://dex-spec.fly.dev/developers.html">
 <meta property="og:image" content="https://dex-spec.fly.dev/og.png">
@@ -423,8 +423,8 @@
   <div class="hero-content">
     <div class="logo">ARI</div>
     <div class="logo-sub">Arithmetic of Intents</div>
-    <div class="hero-title">開発者 &amp; Solver向け</div>
-    <p class="hero-desc">ARI上での構築、Intentプロトコルの統合、またはSolverノードの運用に必要な全てがここにあります。</p>
+    <div class="hero-title">For Developers &amp; Solvers</div>
+    <p class="hero-desc">Everything you need to build on ARI, integrate the intent protocol, or run a solver node.</p>
   </div>
 </div>
 
@@ -432,52 +432,52 @@
 <nav>
   <div class="container">
     <a href="index.html" class="nav-logo">ARI</a>
-    <a href="#architecture">アーキテクチャ</a>
+    <a href="#architecture">Architecture</a>
     <a href="#api">API</a>
-    <a href="#solvers">Solver</a>
-    <a href="#sdk">SDK &amp; ツール</a>
-    <a href="#contracts">コントラクト</a>
+    <a href="#solvers">Solvers</a>
+    <a href="#sdk">SDK &amp; Tools</a>
+    <a href="#contracts">Contracts</a>
     <a href="#intent-schema">Intent Schema</a>
     <a href="#github">GitHub</a>
-    <a href="en/developers.html" style="margin-left: auto; color: var(--primary-light); font-weight: 600;">EN</a>
+    <a href="../developers.html" style="margin-left: auto; border: 1px solid var(--border); color: var(--text);">JP</a>
   </div>
 </nav>
 
 <!-- ===== 1. ARCHITECTURE OVERVIEW ===== -->
 <section id="architecture">
 <div class="container">
-  <div class="section-label reveal">システム設計</div>
-  <h2 class="reveal"><span class="gradient">アーキテクチャ</span>概要</h2>
-  <p class="section-sub reveal">ARIは5層のスタック構成です。各レイヤーはモジュール化されており、独立してアップグレード可能です。</p>
+  <div class="section-label reveal">System Design</div>
+  <h2 class="reveal"><span class="gradient">Architecture</span> Overview</h2>
+  <p class="section-sub reveal">ARI is a 5-layer stack. Every layer is modular and independently upgradable.</p>
 
   <div class="reveal">
     <div class="arch-layer" style="background: linear-gradient(90deg, rgba(99,102,241,0.04), transparent);">
-      <div style="--c: var(--primary-light);" class="layer-name">Layer 5 &mdash; フロントエンド</div>
-      <div class="layer-desc">React SPA、Mobile SDK、React Widget。ユーザーはシンプルなスワップUIを通じてIntentを表現します。チェーン選択は不要です。</div>
+      <div style="--c: var(--primary-light);" class="layer-name">Layer 5 &mdash; Frontend</div>
+      <div class="layer-desc">React SPA, Mobile SDK, React Widget. Users express intents through a simple swap UI. No chain selection needed.</div>
     </div>
     <div class="arch-arrow">&darr;</div>
 
     <div class="arch-layer" style="background: linear-gradient(90deg, rgba(0,180,216,0.04), transparent);">
-      <div style="color: var(--accent2);" class="layer-name">Layer 4 &mdash; ゲートウェイ</div>
-      <div class="layer-desc">REST + WebSocket API。Intentの検証、レート制限、Solverネットワークへのルーティングを行います。Permit2署名の検証も処理します。</div>
+      <div style="color: var(--accent2);" class="layer-name">Layer 4 &mdash; Gateway</div>
+      <div class="layer-desc">REST + WebSocket API. Validates intents, rate-limits, and routes to the solver network. Handles Permit2 signature verification.</div>
     </div>
     <div class="arch-arrow">&darr;</div>
 
     <div class="arch-layer" style="background: linear-gradient(90deg, rgba(6,214,160,0.04), transparent);">
-      <div style="color: var(--accent);" class="layer-name">Layer 3 &mdash; Solverネットワーク</div>
-      <div class="layer-desc">競合するSolverが接続された全チェーンにわたって最適な実行ルートを発見します。Dutch Auctionにより各バッチの勝者Solverが決定されます。</div>
+      <div style="color: var(--accent);" class="layer-name">Layer 3 &mdash; Solver Network</div>
+      <div class="layer-desc">Competing solvers discover optimal execution routes across all connected chains. Dutch auction determines the winning solver for each batch.</div>
     </div>
     <div class="arch-arrow">&darr;</div>
 
     <div class="arch-layer" style="background: linear-gradient(90deg, rgba(245,158,11,0.04), transparent);">
-      <div style="color: var(--warning);" class="layer-name">Layer 2 &mdash; マッチングエンジン</div>
-      <div class="layer-desc">暗号化バッチオークション。閾値復号によりIntentが同時に公開されます。均一清算価格によりMEV抽出を防止します。</div>
+      <div style="color: var(--warning);" class="layer-name">Layer 2 &mdash; Matching Engine</div>
+      <div class="layer-desc">Encrypted batch auction. Threshold decryption reveals intents simultaneously. Uniform clearing price prevents MEV extraction.</div>
     </div>
     <div class="arch-arrow">&darr;</div>
 
     <div class="arch-layer" style="background: linear-gradient(90deg, rgba(239,68,68,0.04), transparent);">
-      <div style="color: var(--danger);" class="layer-name">Layer 1 &mdash; 決済</div>
-      <div class="layer-desc">オンチェーンコントラクト（Ethereum、Arbitrum、Base）。Settlement.solがフィルをアトミックに実行。Vault.solがCLMM流動性ポジションをERC-721 NFTとして管理します。</div>
+      <div style="color: var(--danger);" class="layer-name">Layer 1 &mdash; Settlement</div>
+      <div class="layer-desc">On-chain contracts (Ethereum, Arbitrum, Base). Settlement.sol executes fills atomically. Vault.sol manages CLMM liquidity positions as ERC-721 NFTs.</div>
     </div>
   </div>
 </div>
@@ -486,25 +486,25 @@
 <!-- ===== 2. API QUICK START ===== -->
 <section id="api">
 <div class="container">
-  <div class="section-label reveal">インテグレーション</div>
-  <h2 class="reveal">API <span class="gradient">クイックスタート</span></h2>
-  <p class="section-sub reveal">IntentとクオートのためのRESTfulエンドポイント、およびマーケットデータのリアルタイムWebSocketストリーム。</p>
+  <div class="section-label reveal">Integration</div>
+  <h2 class="reveal">API <span class="gradient">Quick Start</span></h2>
+  <p class="section-sub reveal">RESTful endpoints for intents and quotes, plus real-time WebSocket streams for market data.</p>
 
-  <h3 style="font-size: 1.1rem; margin-bottom: 16px; margin-top: 24px;" class="reveal">REST エンドポイント</h3>
+  <h3 style="font-size: 1.1rem; margin-bottom: 16px; margin-top: 24px;" class="reveal">REST Endpoints</h3>
 
   <div class="reveal">
     <table>
       <thead>
-        <tr><th>メソッド</th><th>エンドポイント</th><th>説明</th></tr>
+        <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
       </thead>
       <tbody>
-        <tr><td style="color: var(--accent); font-weight: 600;">POST</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/intents</td><td>新しいIntentを送信（スワップ、指値、TWAP）</td></tr>
-        <tr><td style="color: var(--accent2); font-weight: 600;">GET</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/intents/{id}</td><td>Intentのステータスとフィル詳細を照会</td></tr>
-        <tr><td style="color: var(--accent2); font-weight: 600;">GET</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/quote</td><td>参考クオートを取得（コミットメントなし）</td></tr>
-        <tr><td style="color: var(--accent2); font-weight: 600;">GET</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/pools</td><td>アクティブな流動性プールとTVLの一覧</td></tr>
-        <tr><td style="color: var(--accent2); font-weight: 600;">GET</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/pools/{id}/ticks</td><td>Tickレベルの流動性分布</td></tr>
-        <tr><td style="color: var(--accent2); font-weight: 600;">GET</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/solvers</td><td>アクティブなSolverレジストリとパフォーマンス</td></tr>
-        <tr><td style="color: var(--warning); font-weight: 600;">DELETE</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/intents/{id}</td><td>保留中のIntentをキャンセル（バッチ締切前）</td></tr>
+        <tr><td style="color: var(--accent); font-weight: 600;">POST</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/intents</td><td>Submit a new intent (swap, limit, TWAP)</td></tr>
+        <tr><td style="color: var(--accent2); font-weight: 600;">GET</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/intents/{id}</td><td>Query intent status and fill details</td></tr>
+        <tr><td style="color: var(--accent2); font-weight: 600;">GET</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/quote</td><td>Get an indicative quote (no commitment)</td></tr>
+        <tr><td style="color: var(--accent2); font-weight: 600;">GET</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/pools</td><td>List active liquidity pools with TVL</td></tr>
+        <tr><td style="color: var(--accent2); font-weight: 600;">GET</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/pools/{id}/ticks</td><td>Tick-level liquidity distribution</td></tr>
+        <tr><td style="color: var(--accent2); font-weight: 600;">GET</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/solvers</td><td>Active solver registry and performance</td></tr>
+        <tr><td style="color: var(--warning); font-weight: 600;">DELETE</td><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">/v1/intents/{id}</td><td>Cancel a pending intent (before batch close)</td></tr>
       </tbody>
     </table>
   </div>
@@ -526,20 +526,20 @@ curl -X POST https://api.ari.exchange/v1/intents \
   }'</span>
   </div>
 
-  <h3 style="font-size: 1.1rem; margin-bottom: 16px; margin-top: 40px;" class="reveal">WebSocket ストリーム</h3>
-  <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 16px;" class="reveal"><code style="color: var(--primary-light); background: var(--surface); padding: 2px 8px; border-radius: 4px;">wss://api.ari.exchange/v1/ws</code> に接続し、チャネルをサブスクライブします：</p>
+  <h3 style="font-size: 1.1rem; margin-bottom: 16px; margin-top: 40px;" class="reveal">WebSocket Streams</h3>
+  <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 16px;" class="reveal">Connect to <code style="color: var(--primary-light); background: var(--surface); padding: 2px 8px; border-radius: 4px;">wss://api.ari.exchange/v1/ws</code> and subscribe to channels:</p>
 
   <div class="reveal">
     <table>
       <thead>
-        <tr><th>チャネル</th><th>ペイロード</th><th>更新頻度</th></tr>
+        <tr><th>Channel</th><th>Payload</th><th>Update Frequency</th></tr>
       </thead>
       <tbody>
-        <tr><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">ticker:{pair}</td><td>最良買値/売値、24時間出来高、最終価格</td><td>100ms</td></tr>
-        <tr><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">orderbook:{pair}</td><td>板情報 上位20段（買い/売り + 厚み）</td><td>250ms</td></tr>
-        <tr><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">trades:{pair}</td><td>約定履歴（Solver帰属情報付き）</td><td>リアルタイム</td></tr>
-        <tr><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">intents:status</td><td>あなたのIntentのライフサイクル更新</td><td>リアルタイム</td></tr>
-        <tr><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">batches</td><td>バッチのオープン/クローズ/決済イベント</td><td>バッチごと（約500ms）</td></tr>
+        <tr><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">ticker:{pair}</td><td>Best bid/ask, 24h volume, last price</td><td>100ms</td></tr>
+        <tr><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">orderbook:{pair}</td><td>Top 20 bid/ask levels with depth</td><td>250ms</td></tr>
+        <tr><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">trades:{pair}</td><td>Executed trades with solver attribution</td><td>Real-time</td></tr>
+        <tr><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">intents:status</td><td>Your intent lifecycle updates</td><td>Real-time</td></tr>
+        <tr><td style="color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">batches</td><td>Batch open/close/settle events</td><td>Per batch (~500ms)</td></tr>
       </tbody>
     </table>
   </div>
@@ -565,25 +565,25 @@ curl -X POST https://api.ari.exchange/v1/intents \
 }
   </div>
 
-  <h3 style="font-size: 1.1rem; margin-bottom: 16px; margin-top: 40px;" class="reveal">レート制限</h3>
+  <h3 style="font-size: 1.1rem; margin-bottom: 16px; margin-top: 40px;" class="reveal">Rate Limits</h3>
   <div class="tier-grid reveal">
     <div class="tier-card">
       <div class="tier-name">Free</div>
       <div class="tier-rate">60</div>
-      <div class="tier-unit">リクエスト / 分</div>
-      <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 12px;">公開APIキー。読み取り専用エンドポイント + Intent送信。</p>
+      <div class="tier-unit">requests / minute</div>
+      <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 12px;">Public API key. Read-only endpoints + intent submission.</p>
     </div>
     <div class="tier-card" style="border-color: rgba(99,102,241,0.3);">
       <div class="tier-name" style="color: var(--primary-light);">Pro</div>
       <div class="tier-rate">600</div>
-      <div class="tier-unit">リクエスト / 分</div>
-      <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 12px;">認証済みアカウント。優先WebSocketストリーム + バッチ分析。</p>
+      <div class="tier-unit">requests / minute</div>
+      <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 12px;">Verified account. Priority WebSocket streams + batch analytics.</p>
     </div>
     <div class="tier-card" style="border-color: rgba(6,214,160,0.3);">
       <div class="tier-name" style="color: var(--accent);">Solver</div>
       <div class="tier-rate">6,000</div>
-      <div class="tier-unit">リクエスト / 分</div>
-      <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 12px;">ステーキング済みSolver。エンジンへの直接アクセス + ソリューション送信エンドポイント。</p>
+      <div class="tier-unit">requests / minute</div>
+      <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 12px;">Staked solvers. Direct engine access + solution submission endpoint.</p>
     </div>
   </div>
 </div>
@@ -592,50 +592,50 @@ curl -X POST https://api.ari.exchange/v1/intents \
 <!-- ===== 3. BECOME A SOLVER ===== -->
 <section id="solvers">
 <div class="container">
-  <div class="section-label reveal">手数料を獲得</div>
-  <h2 class="reveal"><span class="gradient">Solver</span>になる</h2>
-  <p class="section-sub reveal">SolverはARIの基盤です。ユーザーのIntentに対する最適な実行ルートをリアルタイムで競い合います。</p>
+  <div class="section-label reveal">Earn Fees</div>
+  <h2 class="reveal">Become a <span class="gradient">Solver</span></h2>
+  <p class="section-sub reveal">Solvers are the backbone of ARI. They compete in real-time to find the best execution routes for user intents.</p>
 
   <div class="card-grid reveal">
     <div class="card">
       <div class="card-icon">&#9876;</div>
-      <h4>Solverの役割</h4>
-      <p>Solverは暗号化されたIntentバッチを受信し、AMM、ブリッジ、プライベート流動性にわたる最適なフィルルートを計算し、マッチングエンジンにソリューションを送信します。最良のソリューションがバッチを獲得します。</p>
+      <h4>What Solvers Do</h4>
+      <p>Solvers receive encrypted intent batches, compute optimal fill routes across AMMs, bridges, and private liquidity, then submit solutions to the matching engine. The best solution wins the batch.</p>
     </div>
     <div class="card">
       <div class="card-icon">&#9889;</div>
-      <h4>Dutch Auctionメカニズム</h4>
-      <p>各バッチはDutch Auctionで実行されます：価格はSolverに有利な水準から開始し、ユーザーの指値に向かって低下していきます。現在の価格水準で有効なフィルを最初に送信したSolverが落札します。これにより速度と価格品質が奨励されます。</p>
+      <h4>Dutch Auction Mechanism</h4>
+      <p>Each batch runs a Dutch auction: the price starts favorable for the solver and decays toward the user's limit. The first solver to submit a valid fill at the current price level wins. This incentivizes speed and price quality.</p>
     </div>
     <div class="card">
       <div class="card-icon">&#128176;</div>
-      <h4>報酬モデル</h4>
-      <p>落札したSolverは、決済した各バッチの<strong style="color: var(--accent);">取引手数料の80%</strong>を獲得します。残りの20%はプロトコルのトレジャリーと$ARIステーカーに分配されます。上位Solverは追加のパフォーマンスボーナスを獲得できます。</p>
+      <h4>Reward Model</h4>
+      <p>Winning solvers earn <strong style="color: var(--accent);">80% of trade fees</strong> for each batch they settle. The remaining 20% goes to the protocol treasury and $ARI stakers. Top solvers can earn additional performance bonuses.</p>
     </div>
   </div>
 
-  <h3 style="font-size: 1.1rem; margin: 40px 0 16px;" class="reveal">参加方法</h3>
+  <h3 style="font-size: 1.1rem; margin: 40px 0 16px;" class="reveal">How to Participate</h3>
 
   <div class="reveal">
     <div class="flow-step">
       <div class="flow-num">1</div>
       <div class="flow-content">
-        <h4>100,000 $ARIをステーキング</h4>
-        <p>Solverは最低100K $ARIトークンをSolverRegistryコントラクトにステーキングする必要があります。このステーキングはパフォーマンスボンドとして機能し、悪意のある行為（無効なフィルの送信など）に対してスラッシング可能です。</p>
+        <h4>Stake 100,000 $ARI</h4>
+        <p>Solvers must stake a minimum of 100K $ARI tokens to the SolverRegistry contract. This stake acts as a performance bond and is slashable for malicious behavior (e.g., submitting invalid fills).</p>
       </div>
     </div>
     <div class="flow-step">
       <div class="flow-num">2</div>
       <div class="flow-content">
-        <h4>Solverノードを実行</h4>
-        <p>あなたのインフラ上に<code style="color: var(--primary-light); background: var(--surface); padding: 2px 8px; border-radius: 4px;">ari-solver</code>をデプロイします。ノードはSolverネットワークに接続し、バッチデータを受信し、ソリューションを送信します。</p>
+        <h4>Run the Solver Node</h4>
+        <p>Deploy <code style="color: var(--primary-light); background: var(--surface); padding: 2px 8px; border-radius: 4px;">ari-solver</code> on your infrastructure. The node connects to the solver network, receives batch data, and submits solutions.</p>
       </div>
     </div>
     <div class="flow-step">
       <div class="flow-num">3</div>
       <div class="flow-content">
-        <h4>戦略を構築</h4>
-        <p>カスタムルーティングロジックを実装します。オンチェーンAMM、CEX API、プライベートマーケットメーカー、またはクロスチェーンブリッジに接続します。Solver SDKは各ステップのフックを提供します。</p>
+        <h4>Build Your Strategy</h4>
+        <p>Implement custom routing logic. Connect to on-chain AMMs, CEX APIs, private market makers, or cross-chain bridges. The solver SDK provides hooks for every step.</p>
       </div>
     </div>
   </div>
@@ -661,9 +661,9 @@ ari-solver run --strategy custom --log-level info
 <!-- ===== 4. SDK & TOOLS ===== -->
 <section id="sdk">
 <div class="container">
-  <div class="section-label reveal">ツール</div>
-  <h2 class="reveal">SDK &amp; <span class="gradient">ツール</span></h2>
-  <p class="section-sub reveal">RustとTypeScriptのファーストクラスサポート。あらゆるアプリケーションにARIスワップを組み込めます。</p>
+  <div class="section-label reveal">Tooling</div>
+  <h2 class="reveal">SDK &amp; <span class="gradient">Tools</span></h2>
+  <p class="section-sub reveal">First-class support for Rust and TypeScript. Embed ARI swaps into any application.</p>
 
   <div class="card-grid reveal">
     <div class="card">
@@ -671,7 +671,7 @@ ari-solver run --strategy custom --log-level info
         <span class="tag tag-rust">Rust</span>
         <h4 style="margin-bottom: 0;">ari-core</h4>
       </div>
-      <p>コア型、Intent検証、暗号プリミティブ（閾値暗号、Poseidonハッシュ）。他のすべてのARIパッケージが使用する基盤クレートです。</p>
+      <p>Core types, intent validation, cryptographic primitives (threshold encryption, Poseidon hashing). The foundational crate used by all other ARI packages.</p>
       <div class="code-block" style="margin-top: 12px;">
         <span class="lang-tag">toml</span>
 [dependencies]
@@ -683,7 +683,7 @@ ari-core = <span class="c-str">"0.1"</span>
         <span class="tag tag-rust">Rust</span>
         <h4 style="margin-bottom: 0;">ari-solver</h4>
       </div>
-      <p>完全なSolverノード実装。バッチリスナー、ルートオプティマイザー、ソリューションビルダー、オンチェーン決済サブミッターを含みます。トレイトベースの戦略フックにより拡張可能です。</p>
+      <p>Full solver node implementation. Includes batch listener, route optimizer, solution builder, and on-chain settlement submitter. Extensible via trait-based strategy hooks.</p>
       <div class="code-block" style="margin-top: 12px;">
         <span class="lang-tag">toml</span>
 [dependencies]
@@ -695,7 +695,7 @@ ari-solver = <span class="c-str">"0.1"</span>
         <span class="tag tag-rust">Rust</span>
         <h4 style="margin-bottom: 0;">ari-crypto</h4>
       </div>
-      <p>閾値暗号（BLS12-381）、Poseidonハッシュ、プライベート決済用のゼロ知識証明生成。SolverとマッチングエンジンGの両方で使用されます。</p>
+      <p>Threshold encryption (BLS12-381), Poseidon hash, zero-knowledge proof generation for private settlement. Used by both solvers and the matching engine.</p>
       <div class="code-block" style="margin-top: 12px;">
         <span class="lang-tag">toml</span>
 [dependencies]
@@ -707,7 +707,7 @@ ari-crypto = <span class="c-str">"0.1"</span>
         <span class="tag tag-ts">TypeScript</span>
         <h4 style="margin-bottom: 0;">@ari-dex/sdk</h4>
       </div>
-      <p>ブラウザとNode.js向けのTypeScript SDK。Intentの送信、マーケットデータのストリーミング、Permit2署名の管理。Rustコアから自動生成された型による完全な型安全性。</p>
+      <p>TypeScript SDK for browser and Node.js. Submit intents, stream market data, manage Permit2 signatures. Full type safety with auto-generated types from the Rust core.</p>
       <div class="code-block" style="margin-top: 12px;">
         <span class="lang-tag">bash</span>
 npm install <span class="c-str">@ari-dex/sdk</span>
@@ -718,7 +718,7 @@ npm install <span class="c-str">@ari-dex/sdk</span>
         <span class="tag tag-ts">TypeScript</span>
         <h4 style="margin-bottom: 0;">@ari-dex/react</h4>
       </div>
-      <p>ドロップインのReactスワップウィジェット。テーマ対応、レスポンシブ、ウォレット連携（WalletConnect、MetaMask、Coinbase Wallet対応）。3行のコードで埋め込めます。</p>
+      <p>Drop-in React swap widget. Fully themed, responsive, wallet-aware (supports WalletConnect, MetaMask, Coinbase Wallet). Embed in 3 lines of code.</p>
       <div class="code-block" style="margin-top: 12px;">
         <span class="lang-tag">tsx</span>
 <span class="c-kw">import</span> { <span class="c-type">SwapWidget</span> } <span class="c-kw">from</span> <span class="c-str">'@ari-dex/react'</span>
@@ -764,9 +764,9 @@ client.<span class="c-fn">onIntentUpdate</span>(intent.id, (status) =&gt; {
 <!-- ===== 5. SMART CONTRACTS ===== -->
 <section id="contracts">
 <div class="container">
-  <div class="section-label reveal">オンチェーン</div>
-  <h2 class="reveal">スマート<span class="gradient">コントラクト</span></h2>
-  <p class="section-sub reveal">最小限のオンチェーンフットプリント。複雑なロジックはすべてオフチェーンのSolverで実行され、コントラクトはアトミック決済と流動性管理のみを担当します。</p>
+  <div class="section-label reveal">On-Chain</div>
+  <h2 class="reveal">Smart <span class="gradient">Contracts</span></h2>
+  <p class="section-sub reveal">Minimal on-chain footprint. All complex logic runs off-chain in solvers; contracts only handle atomic settlement and liquidity custody.</p>
 
   <div class="card-grid reveal">
     <div class="card">
@@ -774,9 +774,9 @@ client.<span class="c-fn">onIntentUpdate</span>(intent.id, (status) =&gt; {
         <span class="tag tag-sol">Solidity</span>
         <h4 style="margin-bottom: 0;">Settlement.sol</h4>
       </div>
-      <p>Solverが送信したフィルをアトミックに実行します。ガスレストークン承認のために<strong>Permit2</strong>を使用。Solver署名の検証、デッドライン + スリッページ制約の適用、手数料の分配を行います。</p>
+      <p>Executes solver-submitted fills atomically. Uses <strong>Permit2</strong> for gasless token approvals. Verifies solver signatures, enforces deadline + slippage constraints, and distributes fees.</p>
       <div style="margin-top: 12px; font-size: 0.82rem; color: var(--text-dim);">
-        <strong style="color: var(--text);">主要関数:</strong> <code style="color: var(--primary-light);">settle()</code>, <code style="color: var(--primary-light);">batchSettle()</code>, <code style="color: var(--primary-light);">cancelIntent()</code>
+        <strong style="color: var(--text);">Key functions:</strong> <code style="color: var(--primary-light);">settle()</code>, <code style="color: var(--primary-light);">batchSettle()</code>, <code style="color: var(--primary-light);">cancelIntent()</code>
       </div>
     </div>
     <div class="card">
@@ -784,9 +784,9 @@ client.<span class="c-fn">onIntentUpdate</span>(intent.id, (status) =&gt; {
         <span class="tag tag-sol">Solidity</span>
         <h4 style="margin-bottom: 0;">Vault.sol</h4>
       </div>
-      <p>集中流動性マーケットメーカー（CLMM）ボールト。LPポジションは<strong>ERC-721 NFT</strong>として表現され、それぞれがTick範囲と手数料ティアをエンコードします。片側預入と自動複利をサポートします。</p>
+      <p>Concentrated Liquidity Market Maker (CLMM) vault. LP positions are represented as <strong>ERC-721 NFTs</strong>, each encoding a tick range and fee tier. Supports single-sided deposits and auto-compounding.</p>
       <div style="margin-top: 12px; font-size: 0.82rem; color: var(--text-dim);">
-        <strong style="color: var(--text);">主要関数:</strong> <code style="color: var(--primary-light);">mint()</code>, <code style="color: var(--primary-light);">burn()</code>, <code style="color: var(--primary-light);">collect()</code>, <code style="color: var(--primary-light);">rebalance()</code>
+        <strong style="color: var(--text);">Key functions:</strong> <code style="color: var(--primary-light);">mint()</code>, <code style="color: var(--primary-light);">burn()</code>, <code style="color: var(--primary-light);">collect()</code>, <code style="color: var(--primary-light);">rebalance()</code>
       </div>
     </div>
     <div class="card">
@@ -794,18 +794,18 @@ client.<span class="c-fn">onIntentUpdate</span>(intent.id, (status) =&gt; {
         <span class="tag tag-sol">Solidity</span>
         <h4 style="margin-bottom: 0;">SolverRegistry.sol</h4>
       </div>
-      <p>Solverのステーキング、スラッシング、レピュテーションスコアを管理します。Solverは最低100K $ARIのステーキングを維持する必要があります。スラッシング条件：無効なフィル、タイムアウト違反、証明可能な共謀。</p>
+      <p>Manages solver staking, slashing, and reputation scores. Solvers must maintain a minimum 100K $ARI stake. Slashing conditions: invalid fills, timeout violations, or provable collusion.</p>
       <div style="margin-top: 12px; font-size: 0.82rem; color: var(--text-dim);">
-        <strong style="color: var(--text);">主要関数:</strong> <code style="color: var(--primary-light);">register()</code>, <code style="color: var(--primary-light);">slash()</code>, <code style="color: var(--primary-light);">withdraw()</code>
+        <strong style="color: var(--text);">Key functions:</strong> <code style="color: var(--primary-light);">register()</code>, <code style="color: var(--primary-light);">slash()</code>, <code style="color: var(--primary-light);">withdraw()</code>
       </div>
     </div>
   </div>
 
-  <h3 style="font-size: 1.1rem; margin: 40px 0 16px;" class="reveal">デプロイ済みネットワーク</h3>
+  <h3 style="font-size: 1.1rem; margin: 40px 0 16px;" class="reveal">Deployed Networks</h3>
   <div class="reveal">
     <table>
       <thead>
-        <tr><th>ネットワーク</th><th>Settlement</th><th>Vault</th><th>SolverRegistry</th></tr>
+        <tr><th>Network</th><th>Settlement</th><th>Vault</th><th>SolverRegistry</th></tr>
       </thead>
       <tbody>
         <tr>
@@ -828,7 +828,7 @@ client.<span class="c-fn">onIntentUpdate</span>(intent.id, (status) =&gt; {
         </tr>
       </tbody>
     </table>
-    <p style="color: var(--text-dim); font-size: 0.82rem; margin-top: 8px;">コントラクトアドレスはテストネットデプロイ時に公開されます。</p>
+    <p style="color: var(--text-dim); font-size: 0.82rem; margin-top: 8px;">Contract addresses will be published upon testnet deployment.</p>
   </div>
 </div>
 </section>
@@ -836,9 +836,9 @@ client.<span class="c-fn">onIntentUpdate</span>(intent.id, (status) =&gt; {
 <!-- ===== 6. INTENT SCHEMA ===== -->
 <section id="intent-schema">
 <div class="container">
-  <div class="section-label reveal">データモデル</div>
+  <div class="section-label reveal">Data Model</div>
   <h2 class="reveal">Intent <span class="gradient">Schema</span></h2>
-  <p class="section-sub reveal">ユーザーのIntentを表す正規のRust型。これはスタックの全レイヤーを流れるコアデータ構造です。</p>
+  <p class="section-sub reveal">The canonical Rust type representing a user intent. This is the core data structure that flows through every layer of the stack.</p>
 
   <div class="code-block reveal">
     <span class="lang-tag">rust</span>
@@ -919,30 +919,30 @@ client.<span class="c-fn">onIntentUpdate</span>(intent.id, (status) =&gt; {
 <!-- ===== 7. GITHUB ===== -->
 <section id="github">
 <div class="container" style="text-align: center;">
-  <div class="section-label reveal">オープンソース</div>
-  <h2 class="reveal"><span class="gradient">ARI</span>で構築しよう</h2>
-  <p style="color: var(--text-dim); margin-bottom: 32px; font-size: 0.95rem;" class="reveal">ARIはオープンソースです。コードベースの閲覧、イシューの投稿、または直接コントリビュートできます。</p>
+  <div class="section-label reveal">Open Source</div>
+  <h2 class="reveal">Build with <span class="gradient">ARI</span></h2>
+  <p style="color: var(--text-dim); margin-bottom: 32px; font-size: 0.95rem;" class="reveal">ARI is open source. Explore the codebase, submit issues, or contribute directly.</p>
 
   <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;" class="reveal">
     <a href="https://github.com/yukihamada/ari-dex" target="_blank" class="btn btn-primary">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-      GitHub リポジトリ
+      GitHub Repository
     </a>
-    <a href="index.html" class="btn btn-outline">ホームに戻る</a>
+    <a href="index.html" class="btn btn-outline">Back to Home</a>
   </div>
 
   <div class="metric-grid reveal" style="margin-top: 40px; max-width: 700px; margin-left: auto; margin-right: auto;">
     <div class="metric">
       <div class="metric-value" style="font-size: 1.6rem;">MIT</div>
-      <div class="metric-label">ライセンス</div>
+      <div class="metric-label">License</div>
     </div>
     <div class="metric">
       <div class="metric-value" style="font-size: 1.6rem;">Rust</div>
-      <div class="metric-label">主要言語</div>
+      <div class="metric-label">Primary Language</div>
     </div>
     <div class="metric">
       <div class="metric-value" style="font-size: 1.6rem;">5</div>
-      <div class="metric-label">クレート数</div>
+      <div class="metric-label">Crates</div>
     </div>
   </div>
 </div>
@@ -952,11 +952,11 @@ client.<span class="c-fn">onIntentUpdate</span>(intent.id, (status) =&gt; {
 <footer>
   <div class="container">
     <div class="footer-logo">ARI</div>
-    <p>Intent ベースの MEV 保護付き DEX</p>
+    <p>Intent-Based DEX with MEV Protection</p>
     <p style="margin-top: 16px;">
       <a href="https://github.com/yukihamada/ari-dex" target="_blank">GitHub</a>
       &nbsp;&middot;&nbsp;
-      <a href="index.html">ホーム</a>
+      <a href="index.html">Home</a>
       &nbsp;&middot;&nbsp;
       Built with Claude Code (Opus 4.6)
     </p>
