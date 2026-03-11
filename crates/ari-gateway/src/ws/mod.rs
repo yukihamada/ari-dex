@@ -59,49 +59,47 @@ pub fn create_broadcast() -> broadcast::Sender<BroadcastEvent> {
     tx
 }
 
-/// Spawn the background price ticker that fetches live prices every 10 seconds.
+/// Spawn the background price ticker that reads from the shared price cache every 15 seconds.
+/// The cache is populated by the quote endpoint (no duplicate CoinGecko calls).
 pub fn spawn_price_ticker(tx: broadcast::Sender<BroadcastEvent>) {
     tokio::spawn(async move {
-        loop {
-            tokio::time::sleep(std::time::Duration::from_secs(10)).await;
+        // Initial delay to let the first quote request populate cache
+        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
 
+        loop {
             let now = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap_or_default()
                 .as_secs();
 
-            // Fetch live prices from CoinGecko
-            let url = "https://api.coingecko.com/api/v3/simple/price?ids=ethereum,wrapped-bitcoin&vs_currencies=usd";
-            let client = reqwest::Client::builder()
-                .user_agent("ARI-DEX/0.1")
-                .build()
-                .unwrap_or_default();
-            let prices = match client.get(url).send().await {
-                Ok(resp) => resp
-                    .json::<std::collections::HashMap<String, std::collections::HashMap<String, f64>>>()
-                    .await
-                    .ok(),
-                Err(_) => None,
+            // Trigger a cache refresh via the shared price cache
+            crate::routes::quote::refresh_prices().await;
+
+            // Read from the shared price cache
+            let cache = crate::routes::quote::cache();
+            let prices = {
+                let r = cache.read().await;
+                r.prices.clone()
             };
 
-            if let Some(data) = prices {
-                if let Some(eth_usd) = data.get("ethereum").and_then(|m| m.get("usd")) {
-                    let _ = tx.send(BroadcastEvent::Price(PriceUpdate {
-                        channel: "prices",
-                        pair: "ETH/USDC".to_string(),
-                        price: (*eth_usd * 100.0).round() / 100.0,
-                        timestamp: now,
-                    }));
-                }
-                if let Some(btc_usd) = data.get("wrapped-bitcoin").and_then(|m| m.get("usd")) {
-                    let _ = tx.send(BroadcastEvent::Price(PriceUpdate {
-                        channel: "prices",
-                        pair: "BTC/USDC".to_string(),
-                        price: (*btc_usd * 100.0).round() / 100.0,
-                        timestamp: now,
-                    }));
-                }
+            if let Some(&eth_usd) = prices.get("ETH") {
+                let _ = tx.send(BroadcastEvent::Price(PriceUpdate {
+                    channel: "prices",
+                    pair: "ETH/USDC".to_string(),
+                    price: (eth_usd * 100.0).round() / 100.0,
+                    timestamp: now,
+                }));
             }
+            if let Some(&btc_usd) = prices.get("WBTC") {
+                let _ = tx.send(BroadcastEvent::Price(PriceUpdate {
+                    channel: "prices",
+                    pair: "BTC/USDC".to_string(),
+                    price: (btc_usd * 100.0).round() / 100.0,
+                    timestamp: now,
+                }));
+            }
+
+            tokio::time::sleep(std::time::Duration::from_secs(15)).await;
         }
     });
 }

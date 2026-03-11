@@ -45,12 +45,12 @@ struct QuoteResponse {
 
 static PRICE_CACHE: std::sync::OnceLock<Arc<RwLock<PriceCache>>> = std::sync::OnceLock::new();
 
-struct PriceCache {
-    prices: HashMap<String, f64>,
-    updated_at: Instant,
+pub struct PriceCache {
+    pub prices: HashMap<String, f64>,
+    pub updated_at: Instant,
 }
 
-fn cache() -> &'static Arc<RwLock<PriceCache>> {
+pub fn cache() -> &'static Arc<RwLock<PriceCache>> {
     PRICE_CACHE.get_or_init(|| {
         Arc::new(RwLock::new(PriceCache {
             prices: default_prices(),
@@ -69,55 +69,58 @@ fn default_prices() -> HashMap<String, f64> {
     m
 }
 
-async fn refresh_prices() {
+pub async fn refresh_prices() {
     let c = cache();
     {
         let r = c.read().await;
-        if r.updated_at.elapsed() < Duration::from_secs(30) {
+        if r.updated_at.elapsed() < Duration::from_secs(60) {
             return; // fresh enough
         }
     }
 
+    let client = reqwest::Client::builder()
+        .user_agent("ARI-DEX/0.1")
+        .timeout(Duration::from_secs(10))
+        .build()
+        .unwrap_or_default();
+
+    // Try CoinGecko first, then CryptoCompare as fallback
+    let new_prices = fetch_coingecko(&client).await
+        .or(fetch_cryptocompare(&client).await);
+
+    if let Ok(prices) = new_prices {
+        if !prices.is_empty() {
+            let mut w = c.write().await;
+            for (k, v) in prices {
+                w.prices.insert(k, v);
+            }
+            w.updated_at = Instant::now();
+            tracing::info!("Prices updated: {:?}", w.prices);
+        }
+    }
+}
+
+async fn fetch_coingecko(client: &reqwest::Client) -> Result<HashMap<String, f64>, ()> {
     let ids = "ethereum,wrapped-bitcoin,usd-coin,tether,dai";
     let url = format!(
         "https://api.coingecko.com/api/v3/simple/price?ids={}&vs_currencies=usd",
         ids
     );
 
-    tracing::info!("Fetching live prices from CoinGecko...");
-    let client = reqwest::Client::builder()
-        .user_agent("ARI-DEX/0.1")
-        .timeout(Duration::from_secs(10))
-        .build()
-        .unwrap_or_default();
-    let resp = match client.get(&url).send().await {
-        Ok(r) => {
-            tracing::info!("CoinGecko response status: {}", r.status());
-            r
-        }
-        Err(e) => {
-            tracing::error!("CoinGecko fetch failed: {e}");
-            return;
-        }
-    };
+    let resp = client.get(&url).send().await.map_err(|e| {
+        tracing::warn!("CoinGecko fetch failed: {e}");
+    })?;
 
-    let body = match resp.text().await {
-        Ok(b) => b,
-        Err(e) => {
-            tracing::error!("CoinGecko read body failed: {e}");
-            return;
-        }
-    };
+    if !resp.status().is_success() {
+        tracing::warn!("CoinGecko returned {}", resp.status());
+        return Err(());
+    }
 
-    let data: HashMap<String, HashMap<String, f64>> = match serde_json::from_str(&body) {
-        Ok(d) => d,
-        Err(e) => {
-            tracing::error!("CoinGecko parse failed: {e}, body: {}", &body[..body.len().min(200)]);
-            return;
-        }
-    };
+    let data: HashMap<String, HashMap<String, f64>> = resp.json().await.map_err(|e| {
+        tracing::warn!("CoinGecko parse failed: {e}");
+    })?;
 
-    let mut new_prices = HashMap::new();
+    let mut prices = HashMap::new();
     let symbols = [
         ("ethereum", "ETH"),
         ("wrapped-bitcoin", "WBTC"),
@@ -128,19 +131,45 @@ async fn refresh_prices() {
     for (cg_id, sym) in &symbols {
         if let Some(inner) = data.get(*cg_id) {
             if let Some(usd) = inner.get("usd") {
-                new_prices.insert(sym.to_string(), *usd);
+                prices.insert(sym.to_string(), *usd);
             }
         }
     }
+    tracing::info!("CoinGecko prices: {:?}", prices);
+    Ok(prices)
+}
 
-    if !new_prices.is_empty() {
-        let mut w = c.write().await;
-        for (k, v) in new_prices {
-            w.prices.insert(k, v);
-        }
-        w.updated_at = Instant::now();
-        tracing::info!("Prices updated: {:?}", w.prices);
+async fn fetch_cryptocompare(client: &reqwest::Client) -> Result<HashMap<String, f64>, ()> {
+    let url = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=ETH,BTC&tsyms=USD";
+
+    let resp = client.get(url).send().await.map_err(|e| {
+        tracing::warn!("CryptoCompare fetch failed: {e}");
+    })?;
+
+    if !resp.status().is_success() {
+        tracing::warn!("CryptoCompare returned {}", resp.status());
+        return Err(());
     }
+
+    // Response: {"ETH":{"USD":2077},"BTC":{"USD":71000}}
+    let data: HashMap<String, HashMap<String, f64>> = resp.json().await.map_err(|e| {
+        tracing::warn!("CryptoCompare parse failed: {e}");
+    })?;
+
+    let mut prices = HashMap::new();
+    if let Some(eth) = data.get("ETH").and_then(|m| m.get("USD")) {
+        prices.insert("ETH".to_string(), *eth);
+    }
+    if let Some(btc) = data.get("BTC").and_then(|m| m.get("USD")) {
+        prices.insert("WBTC".to_string(), *btc);
+    }
+    // Stables stay at 1.0
+    prices.insert("USDC".to_string(), 1.0);
+    prices.insert("USDT".to_string(), 1.0);
+    prices.insert("DAI".to_string(), 1.0);
+
+    tracing::info!("CryptoCompare prices: {:?}", prices);
+    Ok(prices)
 }
 
 async fn price_usd(token: &str) -> f64 {
