@@ -1,7 +1,7 @@
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { injected } from "wagmi/connectors";
 
-type Page = "swap" | "pools" | "liquidity" | "portfolio" | "solvers" | "docs";
+type Page = "swap" | "pools" | "liquidity" | "portfolio" | "solvers" | "docs" | "blog";
 
 interface HeaderProps {
   currentPage: Page;
@@ -23,6 +23,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
     { page: "portfolio", label: "Portfolio" },
     { page: "solvers", label: "Solvers" },
     { page: "docs", label: "Docs" },
+    { page: "blog", label: "Blog" },
   ];
 
   return (

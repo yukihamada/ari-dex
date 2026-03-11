@@ -1151,6 +1151,59 @@ body::after {
   border-color: var(--text-dim);
 }
 
+.docs-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.docs-list li {
+  padding: 8px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.docs-severity {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.docs-severity--critical {
+  background: rgba(255, 59, 48, 0.15);
+  color: #ff3b30;
+}
+
+.docs-severity--high {
+  background: rgba(255, 149, 0, 0.15);
+  color: #ff9500;
+}
+
+.docs-severity--medium {
+  background: rgba(255, 204, 0, 0.15);
+  color: #ffcc00;
+}
+
+.docs-severity--low {
+  background: rgba(52, 199, 89, 0.15);
+  color: #34c759;
+}
+
+.docs-section-subtitle {
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--text);
+  margin: 20px 0 8px;
+}
+
 .docs-cta-btn {
   display: inline-block;
   padding: 12px 32px;
@@ -1211,4 +1264,196 @@ body::after {
 
 .loading {
   animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Blog Page */
+.blog-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 16px 64px;
+}
+
+.blog-article {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.blog-header {
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.blog-title {
+  font-size: 28px;
+  font-weight: 750;
+  color: var(--text);
+  line-height: 1.3;
+  margin: 0 0 12px;
+}
+
+.blog-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.blog-meta-sep {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text-dim);
+}
+
+.blog-section {
+  margin-bottom: 36px;
+}
+
+.blog-section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 12px;
+}
+
+.blog-text {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-dim);
+  margin: 0 0 12px;
+}
+
+.blog-text strong {
+  color: var(--text);
+  font-weight: 650;
+}
+
+.blog-text code {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: "SF Mono", "Fira Code", monospace;
+}
+
+.blog-milestone {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(124, 92, 252, 0.08);
+  border: 1px solid rgba(124, 92, 252, 0.2);
+  border-radius: var(--radius-md);
+  margin: 16px 0;
+}
+
+.blog-milestone-icon {
+  font-size: 20px;
+}
+
+.blog-milestone-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.blog-stats {
+  display: flex;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.blog-stat {
+  flex: 1;
+  text-align: center;
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.blog-stat-value {
+  display: block;
+  font-size: 22px;
+  font-weight: 750;
+  color: var(--accent);
+}
+
+.blog-stat-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* Timeline */
+.blog-timeline {
+  position: relative;
+  padding-left: 28px;
+}
+
+.blog-timeline::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--border);
+}
+
+.blog-timeline-item {
+  position: relative;
+  padding-bottom: 20px;
+}
+
+.blog-timeline-dot {
+  position: absolute;
+  left: -24px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--card-bg);
+}
+
+.blog-timeline-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.blog-timeline-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* Tech grid */
+.blog-tech-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.blog-tech-card {
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.blog-tech-name {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--text);
+}
+
+.blog-tech-desc {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 2px;
 }

@@ -329,6 +329,95 @@ ws.onmessage = (event) => {
         </div>
       </section>
 
+      {/* Section 7: Security Audit */}
+      <section className="docs-section">
+        <h2 className="docs-section-title">{t.s7Title}</h2>
+        <p className="docs-section-desc">{t.s7Desc}</p>
+
+        <h3 className="docs-section-subtitle">{t.s7ScopeTitle}</h3>
+        <table className="docs-table">
+          <thead>
+            <tr>
+              <th>{t.s7Component}</th>
+              <th>{t.s7Location}</th>
+              <th>{t.s7Priority}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {t.s7ScopeRows.map((row, i) => (
+              <tr key={i}>
+                <td>{row[0]}</td>
+                <td><code>{row[1]}</code></td>
+                <td>{row[2]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <h3 className="docs-section-subtitle">{t.s7HowTitle}</h3>
+        <div className="docs-steps">
+          {t.s7Steps.map((step, i) => (
+            <div key={i} className="docs-step">
+              <div className="docs-step-num">{i + 1}</div>
+              <div className="docs-step-text" dangerouslySetInnerHTML={{ __html: step }} />
+            </div>
+          ))}
+        </div>
+
+        <h3 className="docs-section-subtitle">{t.s7FirmsTitle}</h3>
+        <p className="docs-section-desc">{t.s7FirmsDesc}</p>
+        <ul className="docs-list">
+          {t.s7Firms.map((firm, i) => (
+            <li key={i}>{firm}</li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Section 8: Bug Bounty */}
+      <section className="docs-section">
+        <h2 className="docs-section-title">{t.s8Title}</h2>
+        <p className="docs-section-desc">{t.s8Desc}</p>
+
+        <h3 className="docs-section-subtitle">{t.s8SeverityTitle}</h3>
+        <table className="docs-table">
+          <thead>
+            <tr>
+              <th>{t.s8Severity}</th>
+              <th>{t.s8Reward}</th>
+              <th>{t.s8Example}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {t.s8Rows.map((row, i) => (
+              <tr key={i}>
+                <td><span className={`docs-severity docs-severity--${row[3]}`}>{row[0]}</span></td>
+                <td>{row[1]}</td>
+                <td>{row[2]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <h3 className="docs-section-subtitle">{t.s8RulesTitle}</h3>
+        <div className="docs-steps">
+          {t.s8Rules.map((rule, i) => (
+            <div key={i} className="docs-step">
+              <div className="docs-step-num">{i + 1}</div>
+              <div className="docs-step-text" dangerouslySetInnerHTML={{ __html: rule }} />
+            </div>
+          ))}
+        </div>
+
+        <h3 className="docs-section-subtitle">{t.s8SubmitTitle}</h3>
+        <CodeBlock
+          id="bounty"
+          copied={copied}
+          onCopy={copy}
+          code={t.s8SubmitCode}
+        />
+        <p className="docs-section-desc">{t.s8SubmitNote}</p>
+      </section>
+
       {/* GitHub */}
       <section className="docs-section docs-section--cta">
         <h2 className="docs-section-title">{t.openSource}</h2>
@@ -465,6 +554,81 @@ const ja = {
   s6Transfers: "トークン移転 + イベント発行",
   s6LiquiditySource: "流動性ソース",
 
+  s7Title: "7. セキュリティ監査",
+  s7Desc:
+    "ARI プロトコルのスマートコントラクトは本番稼働前に外部監査を受けることを強く推奨します。以下は監査を実施・依頼する際の具体的な手順です。",
+  s7ScopeTitle: "監査対象スコープ",
+  s7Component: "コンポーネント",
+  s7Location: "場所",
+  s7Priority: "優先度",
+  s7ScopeRows: [
+    ["Settlement.sol（決済コア）", "contracts/src/Settlement.sol", "最高"],
+    ["Vault.sol（CLMM LP）", "contracts/src/Vault.sol", "最高"],
+    ["SolverRegistry.sol（ステーキング）", "contracts/src/SolverRegistry.sol", "高"],
+    ["ConditionalIntent.sol（条件付き注文）", "contracts/src/ConditionalIntent.sol", "高"],
+    ["CrossChainIntent.sol（クロスチェーン）", "contracts/src/CrossChainIntent.sol", "高"],
+    ["PerpetualMarket.sol（レバレッジ）", "contracts/src/PerpetualMarket.sol", "高"],
+    ["VeARI.sol（ガバナンス）", "contracts/src/VeARI.sol", "中"],
+    ["AriPaymaster.sol（AA）", "contracts/src/AriPaymaster.sol", "中"],
+  ] as [string, string, string][],
+  s7HowTitle: "監査を依頼する手順",
+  s7Steps: [
+    "<strong>リポジトリをフォーク</strong> — <code>git clone https://github.com/yukihamada/ari-dex.git</code> で全ソースを取得",
+    "<strong>Foundry テストを実行</strong> — <code>cd contracts && forge test -v</code> で 188 テストが全パスすることを確認",
+    "<strong>監査会社に提出</strong> — <code>contracts/src/</code> ディレクトリ内の全 .sol ファイル + テスト + デプロイスクリプトを提出",
+    "<strong>重点チェック項目</strong> — リエントランシー、EIP-712 署名検証、整数オーバーフロー、フラッシュローン攻撃、アクセス制御、nonce リプレイ",
+    "<strong>監査レポート受領後</strong> — 指摘事項を修正 → 再テスト → 修正コミットを公開 → 監査レポートを <code>audits/</code> ディレクトリに公開",
+  ],
+  s7FirmsTitle: "推奨監査会社",
+  s7FirmsDesc: "DeFi プロトコル監査の実績がある主要企業：",
+  s7Firms: [
+    "Trail of Bits — 形式検証とシステムレベルの脆弱性分析に強み",
+    "OpenZeppelin — Uniswap, Compound, Aave 等の監査実績",
+    "Consensys Diligence — Ethereum エコシステム特化",
+    "Spearbit — 分散型の独立セキュリティ研究者ネットワーク",
+    "Code4rena — 競争型監査プラットフォーム（コスト効率が高い）",
+    "Sherlock — 監査 + プロトコルカバレッジの複合サービス",
+  ],
+
+  s8Title: "8. バグバウンティプログラム",
+  s8Desc:
+    "ARI プロトコルの脆弱性を発見した方に報奨金をお支払いします。責任ある開示（Responsible Disclosure）に従ってください。",
+  s8SeverityTitle: "報奨金テーブル",
+  s8Severity: "深刻度",
+  s8Reward: "報奨金",
+  s8Example: "例",
+  s8Rows: [
+    ["Critical", "最大 $50,000", "資金の窃盗、無限 mint、署名バイパス", "critical"],
+    ["High", "最大 $20,000", "LP 資金のドレイン、不正な清算", "high"],
+    ["Medium", "最大 $5,000", "DoS 攻撃、一時的な資金ロック", "medium"],
+    ["Low", "最大 $1,000", "ガス最適化の欠如、情報漏洩", "low"],
+  ] as [string, string, string, string][],
+  s8RulesTitle: "参加ルール",
+  s8Rules: [
+    "<strong>対象範囲</strong> — <code>contracts/src/</code> 内のデプロイ済みコントラクトのみ（テスト・スクリプトは対象外）",
+    "<strong>報告方法</strong> — GitHub Security Advisory または下記メールで非公開報告（公開 Issue は禁止）",
+    "<strong>再現手順</strong> — Foundry テストケースで脆弱性を再現するコードを添付",
+    "<strong>対応期間</strong> — 報告受領後 48 時間以内に確認、30 日以内に修正リリース",
+    "<strong>禁止事項</strong> — 本番環境への攻撃、他ユーザーの資金への干渉、ソーシャルエンジニアリング",
+    "<strong>報酬支払い</strong> — 修正確認後 ETH または USDC で支払い（ARI トークンでの上乗せオプションあり）",
+  ],
+  s8SubmitTitle: "脆弱性の報告先",
+  s8SubmitCode: `# GitHub Security Advisory（推奨）
+https://github.com/yukihamada/ari-dex/security/advisories/new
+
+# メールでの報告
+security@ari.exchange
+
+# 報告テンプレート
+Title: [深刻度] 脆弱性の概要
+Contract: 対象コントラクト名とアドレス
+Description: 脆弱性の詳細説明
+Impact: 想定される被害
+Steps to Reproduce: 再現手順（Foundry テスト推奨）
+Suggested Fix: 修正案（任意）`,
+  s8SubmitNote:
+    "報告は暗号化メール (PGP) でも受け付けます。PGP 公開鍵はリポジトリの SECURITY.md に記載予定です。",
+
   openSource: "オープンソース",
   openSourceDesc: "ARI は完全にオープンソースです。コントリビューション歓迎。",
   viewGithub: "GitHub で見る",
@@ -563,6 +727,81 @@ const en = {
   s6Matching: "Intent matching + fill calculation",
   s6Transfers: "transfers + event emission",
   s6LiquiditySource: "liquidity source",
+
+  s7Title: "7. Security Audit",
+  s7Desc:
+    "We strongly recommend external security audits before mainnet deployment. Here is a step-by-step guide for conducting or commissioning an audit.",
+  s7ScopeTitle: "Audit Scope",
+  s7Component: "Component",
+  s7Location: "Location",
+  s7Priority: "Priority",
+  s7ScopeRows: [
+    ["Settlement.sol (Core Settlement)", "contracts/src/Settlement.sol", "Critical"],
+    ["Vault.sol (CLMM LP)", "contracts/src/Vault.sol", "Critical"],
+    ["SolverRegistry.sol (Staking)", "contracts/src/SolverRegistry.sol", "High"],
+    ["ConditionalIntent.sol (Conditional Orders)", "contracts/src/ConditionalIntent.sol", "High"],
+    ["CrossChainIntent.sol (Cross-Chain)", "contracts/src/CrossChainIntent.sol", "High"],
+    ["PerpetualMarket.sol (Leverage)", "contracts/src/PerpetualMarket.sol", "High"],
+    ["VeARI.sol (Governance)", "contracts/src/VeARI.sol", "Medium"],
+    ["AriPaymaster.sol (Account Abstraction)", "contracts/src/AriPaymaster.sol", "Medium"],
+  ] as [string, string, string][],
+  s7HowTitle: "How to Commission an Audit",
+  s7Steps: [
+    "<strong>Fork the repository</strong> — <code>git clone https://github.com/yukihamada/ari-dex.git</code> to get the full source",
+    "<strong>Run Foundry tests</strong> — <code>cd contracts && forge test -v</code> to verify all 188 tests pass",
+    "<strong>Submit to auditors</strong> — Provide all .sol files in <code>contracts/src/</code> plus tests and deploy scripts",
+    "<strong>Key focus areas</strong> — Reentrancy, EIP-712 signature verification, integer overflow, flash loan attacks, access control, nonce replay",
+    "<strong>After receiving the report</strong> — Fix findings → re-test → commit fixes → publish audit report in <code>audits/</code> directory",
+  ],
+  s7FirmsTitle: "Recommended Audit Firms",
+  s7FirmsDesc: "Leading firms with DeFi protocol audit experience:",
+  s7Firms: [
+    "Trail of Bits — Formal verification and system-level vulnerability analysis",
+    "OpenZeppelin — Audited Uniswap, Compound, Aave, and more",
+    "Consensys Diligence — Ethereum ecosystem specialists",
+    "Spearbit — Decentralized network of independent security researchers",
+    "Code4rena — Competitive audit platform (cost-effective)",
+    "Sherlock — Combined audit + protocol coverage service",
+  ],
+
+  s8Title: "8. Bug Bounty Program",
+  s8Desc:
+    "We pay bounties for vulnerabilities found in the ARI protocol. Please follow Responsible Disclosure guidelines.",
+  s8SeverityTitle: "Bounty Table",
+  s8Severity: "Severity",
+  s8Reward: "Reward",
+  s8Example: "Example",
+  s8Rows: [
+    ["Critical", "Up to $50,000", "Fund theft, infinite mint, signature bypass", "critical"],
+    ["High", "Up to $20,000", "LP fund drain, unauthorized liquidation", "high"],
+    ["Medium", "Up to $5,000", "DoS attacks, temporary fund lock", "medium"],
+    ["Low", "Up to $1,000", "Gas optimization gaps, information leaks", "low"],
+  ] as [string, string, string, string][],
+  s8RulesTitle: "Rules of Engagement",
+  s8Rules: [
+    "<strong>Scope</strong> — Only deployed contracts in <code>contracts/src/</code> (tests and scripts are out of scope)",
+    "<strong>Reporting</strong> — Use GitHub Security Advisory or email below for private disclosure (public issues are prohibited)",
+    "<strong>Reproduction</strong> — Attach a Foundry test case that reproduces the vulnerability",
+    "<strong>Response time</strong> — Acknowledgment within 48 hours, fix release within 30 days",
+    "<strong>Prohibited</strong> — Attacking production, interfering with other users' funds, social engineering",
+    "<strong>Payment</strong> — Paid in ETH or USDC after fix confirmation (bonus option in ARI tokens)",
+  ],
+  s8SubmitTitle: "Report a Vulnerability",
+  s8SubmitCode: `# GitHub Security Advisory (Recommended)
+https://github.com/yukihamada/ari-dex/security/advisories/new
+
+# Email Report
+security@ari.exchange
+
+# Report Template
+Title: [Severity] Vulnerability Summary
+Contract: Target contract name and address
+Description: Detailed vulnerability description
+Impact: Potential damage assessment
+Steps to Reproduce: Reproduction steps (Foundry test preferred)
+Suggested Fix: Proposed fix (optional)`,
+  s8SubmitNote:
+    "We also accept encrypted reports via PGP. The public key will be published in SECURITY.md in the repository.",
 
   openSource: "Open Source",
   openSourceDesc: "ARI is fully open source. Contributions welcome.",
