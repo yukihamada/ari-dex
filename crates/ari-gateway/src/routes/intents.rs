@@ -89,6 +89,9 @@ async fn submit_intent(
         if let Some(ref code) = referral_code {
             crate::routes::referral::track_referral(&conn, code, &stored.sell_amount);
         }
+
+        // Update trader stats for social trading leaderboard.
+        let _ = db::update_trader_stats(&conn, &stored.sender, &stored.sell_amount, &stored.sell_amount, true);
     }
 
     // Broadcast to WebSocket subscribers

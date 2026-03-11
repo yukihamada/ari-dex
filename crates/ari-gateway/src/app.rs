@@ -3,6 +3,7 @@
 use std::sync::Arc;
 
 use axum::http::{header, HeaderValue, Method};
+use axum::middleware as axum_mw;
 use axum::Router;
 use tower::limit::ConcurrencyLimitLayer;
 use tower_http::cors::CorsLayer;
@@ -11,6 +12,7 @@ use tower_http::services::ServeDir;
 use ari_engine::state::EngineState;
 
 use crate::db;
+use crate::middleware;
 use crate::routes;
 use crate::ws;
 
@@ -44,7 +46,9 @@ pub const MAX_WS_CONNECTIONS: usize = 1000;
 
 /// Builds the axum router with all routes and middleware.
 pub fn build_router(engine: EngineState) -> Router {
-    let conn = db::init_db("./ari-dex.db").expect("Failed to initialize SQLite database");
+    // Use persistent volume path if available, else local
+    let db_path = std::env::var("DB_PATH").unwrap_or_else(|_| "./ari-dex.db".to_string());
+    let conn = db::init_db(&db_path).expect("Failed to initialize SQLite database");
 
     let broadcast_tx = ws::create_broadcast();
     ws::spawn_price_ticker(broadcast_tx.clone());
@@ -59,8 +63,12 @@ pub fn build_router(engine: EngineState) -> Router {
     let cors = CorsLayer::new()
         .allow_origin([
             "http://localhost:3000".parse::<HeaderValue>().unwrap(),
+            "http://localhost:5173".parse::<HeaderValue>().unwrap(),
             "https://dex-spec.fly.dev".parse::<HeaderValue>().unwrap(),
             "https://ari-dex-api.fly.dev".parse::<HeaderValue>().unwrap(),
+            "https://aridex.io".parse::<HeaderValue>().unwrap(),
+            "https://www.aridex.io".parse::<HeaderValue>().unwrap(),
+            "https://ari.exchange".parse::<HeaderValue>().unwrap(),
         ])
         .allow_methods([Method::GET, Method::POST, Method::DELETE, Method::OPTIONS])
         .allow_headers([header::CONTENT_TYPE, header::AUTHORIZATION]);
@@ -86,6 +94,8 @@ pub fn build_router(engine: EngineState) -> Router {
         .merge(routes::positions::router())
         .merge(ws::router())
         .fallback_service(serve_dir)
+        .layer(axum_mw::from_fn(middleware::rate_limit_middleware))
+        .layer(axum_mw::from_fn(middleware::request_logging_middleware))
         .layer(cors)
         .layer(ConcurrencyLimitLayer::new(100))
         .with_state(state)
