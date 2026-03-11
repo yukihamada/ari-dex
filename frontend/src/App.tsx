@@ -8,6 +8,7 @@ import { PoolsPage } from "./components/PoolsPage";
 import { PortfolioPage } from "./components/PortfolioPage";
 import { SolversPage } from "./components/SolversPage";
 import { LiquidityPage } from "./components/LiquidityPage";
+import { DocsPage } from "./components/DocsPage";
 
 const queryClient = new QueryClient();
 
@@ -20,19 +21,19 @@ const wagmiConfig = createConfig({
   },
 });
 
-type Page = "swap" | "pools" | "portfolio" | "solvers" | "liquidity";
+type Page = "swap" | "pools" | "portfolio" | "solvers" | "liquidity" | "docs";
 
 function useHashRoute(): [Page, (p: Page) => void] {
   const [page, setPage] = useState<Page>(() => {
     const hash = window.location.hash.replace("#", "");
-    if (["pools", "portfolio", "solvers", "liquidity"].includes(hash)) return hash as Page;
+    if (["pools", "portfolio", "solvers", "liquidity", "docs"].includes(hash)) return hash as Page;
     return "swap";
   });
 
   useEffect(() => {
     const handler = () => {
       const hash = window.location.hash.replace("#", "");
-      if (["pools", "portfolio", "solvers", "liquidity"].includes(hash)) setPage(hash as Page);
+      if (["pools", "portfolio", "solvers", "liquidity", "docs"].includes(hash)) setPage(hash as Page);
       else setPage("swap");
     };
     window.addEventListener("hashchange", handler);
@@ -100,6 +101,7 @@ export function App() {
             {page === "portfolio" && <PortfolioPage />}
             {page === "solvers" && <SolversPage />}
             {page === "liquidity" && <LiquidityPage />}
+            {page === "docs" && <DocsPage />}
             <Powered />
           </main>
         </div>
