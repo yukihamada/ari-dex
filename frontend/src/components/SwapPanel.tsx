@@ -3,12 +3,12 @@ import { useAccount } from "wagmi";
 import { parseUnits } from "viem";
 import { useQuote } from "../hooks/useQuote";
 import { useSubmitIntent } from "../hooks/useSubmitIntent";
-import { useSignIntent } from "../hooks/useSignIntent";
 import { useTokenBalance } from "../hooks/useTokenBalance";
 import { useTokenApproval } from "../hooks/useTokenApproval";
+import { useSwap } from "../hooks/useSwap";
 import type { Token } from "../types";
 import { ChainId } from "../types";
-import { API_URL } from "../config";
+import { API_URL, DEFAULT_SLIPPAGE_BPS } from "../config";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
@@ -28,7 +28,7 @@ const TOKEN_ICONS: Record<string, string> = {
   WBTC: "\u20BF",
 };
 
-type SwapStep = "idle" | "approving" | "signing" | "submitting" | "confirmed" | "error";
+type SwapStep = "idle" | "approving" | "signing" | "swapping" | "confirming" | "success" | "error";
 
 export function SwapPanel() {
   const { address, isConnected } = useAccount();
@@ -37,11 +37,10 @@ export function SwapPanel() {
   const [buyToken, setBuyToken] = useState<Token>(TOKENS[1]);
   const [sellAmount, setSellAmount] = useState("");
   const [step, setStep] = useState<SwapStep>("idle");
-  const [txResult, setTxResult] = useState<{ intentId?: string; txHash?: string } | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [livePrice, setLivePrice] = useState<Record<string, number>>({});
 
-  // Fetch live prices via WS
+  // WebSocket for live prices
   useEffect(() => {
     let ws: WebSocket | null = null;
     try {
@@ -49,9 +48,7 @@ export function SwapPanel() {
         ? API_URL.replace(/^http/, "ws") + "/ws"
         : `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/ws`;
       ws = new WebSocket(wsUrl);
-      ws.onopen = () => {
-        ws?.send(JSON.stringify({ subscribe: "prices" }));
-      };
+      ws.onopen = () => ws?.send(JSON.stringify({ subscribe: "prices" }));
       ws.onmessage = (e) => {
         try {
           const data = JSON.parse(e.data);
@@ -64,17 +61,17 @@ export function SwapPanel() {
     return () => ws?.close();
   }, []);
 
+  // Quote
   const { data: quote, isLoading: quoteLoading } = useQuote(sellToken, buyToken, sellAmount);
-  const { submit } = useSubmitIntent();
-  const { signIntent } = useSignIntent();
 
-  // Token balance
+  // Intent (for analytics/tracking)
+  const { submit: submitIntent } = useSubmitIntent();
+
+  // Balance
   const { balance: sellBalance, formatted: sellBalanceFormatted } = useTokenBalance(sellToken, address);
 
-  // Token approval (only for ERC-20s, not ETH)
-  const rawSellAmount = sellAmount
-    ? parseUnits(sellAmount, sellToken.decimals)
-    : 0n;
+  // Approval for Uniswap Router (ERC-20 only, not ETH)
+  const rawSellAmount = sellAmount ? parseUnits(sellAmount, sellToken.decimals) : 0n;
   const {
     needsApproval,
     approve,
@@ -84,31 +81,75 @@ export function SwapPanel() {
     approvalTxHash,
   } = useTokenApproval(sellToken.address, address, rawSellAmount);
 
-  // Refetch allowance after approval succeeds
+  // Swap via Uniswap V3
+  const {
+    swap,
+    txHash: swapTxHash,
+    isPending: swapPending,
+    isConfirming: swapConfirming,
+    isSuccess: swapSuccess,
+    error: swapError,
+    reset: resetSwap,
+  } = useSwap();
+
+  // Watch approval success → move to idle
   useEffect(() => {
-    if (isApproved) {
+    if (isApproved && step === "approving") {
       refetchAllowance();
       setStep("idle");
     }
-  }, [isApproved, refetchAllowance]);
+  }, [isApproved, step, refetchAllowance]);
+
+  // Watch swap states
+  useEffect(() => {
+    if (swapPending) setStep("swapping");
+  }, [swapPending]);
+
+  useEffect(() => {
+    if (swapConfirming) setStep("confirming");
+  }, [swapConfirming]);
+
+  useEffect(() => {
+    if (swapSuccess) {
+      setStep("success");
+      // Submit intent to API for analytics
+      if (address && quote) {
+        submitIntent({
+          sellToken,
+          buyToken,
+          sellAmount,
+          minBuyAmount: quote.buy_amount,
+          sender: address,
+        }, { onSuccess: () => {}, onError: () => {} });
+      }
+    }
+  }, [swapSuccess]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (swapError) {
+      setStep("error");
+      setErrorMsg(swapError.message?.includes("User rejected")
+        ? "Transaction rejected by user"
+        : swapError.message?.slice(0, 120) || "Swap failed");
+    }
+  }, [swapError]);
 
   const isSameToken = sellToken.symbol === buyToken.symbol;
   const isETH = sellToken.address === ZERO_ADDRESS;
 
-  // Check if user has sufficient balance
   const hasSufficientBalance =
     sellBalance !== undefined && rawSellAmount > 0n
       ? sellBalance >= rawSellAmount
-      : true; // Don't block if we can't check
+      : true;
 
   const handleSwapTokens = useCallback(() => {
     setSellToken(buyToken);
     setBuyToken(sellToken);
     setSellAmount("");
-    setTxResult(null);
     setErrorMsg(null);
     setStep("idle");
-  }, [sellToken, buyToken]);
+    resetSwap();
+  }, [sellToken, buyToken, resetSwap]);
 
   const handleApprove = useCallback(() => {
     setStep("approving");
@@ -116,53 +157,28 @@ export function SwapPanel() {
     approve();
   }, [approve]);
 
-  const handleSubmit = useCallback(async () => {
+  const handleSwap = useCallback(async () => {
     if (!sellAmount || !quote || isSameToken || !isConnected || !address) return;
-
     setErrorMsg(null);
-    setStep("signing");
 
-    try {
-      // Step 1: Sign the intent with EIP-712
-      const result = await signIntent({
-        sender: address,
-        sellToken,
-        buyToken,
-        sellAmount,
-        minBuyAmount: quote.buy_amount,
-      });
+    // Calculate minimum output with slippage tolerance
+    const buyAmountRaw = BigInt(quote.buy_amount);
+    const slippageMultiplier = 10000n - BigInt(DEFAULT_SLIPPAGE_BPS); // 9950 for 0.5%
+    const amountOutMinimum = (buyAmountRaw * slippageMultiplier) / 10000n;
 
-      // Step 2: Submit intent to API
-      setStep("submitting");
-      submit(
-        {
-          sellToken,
-          buyToken,
-          sellAmount,
-          minBuyAmount: quote.buy_amount,
-          sender: address,
-          signature: result.signature,
-          deadline: result.deadline,
-          nonce: result.nonce,
-        },
-        {
-          onSuccess: (data) => {
-            setStep("confirmed");
-            setTxResult({
-              intentId: data.intent_id,
-            });
-          },
-          onError: (err) => {
-            setStep("error");
-            setErrorMsg(err.message);
-          },
-        },
-      );
-    } catch (err) {
-      setStep("error");
-      setErrorMsg(err instanceof Error ? err.message : "Transaction failed");
-    }
-  }, [sellToken, buyToken, sellAmount, quote, submit, address, isConnected, signIntent, isSameToken]);
+    const deadline = BigInt(Math.floor(Date.now() / 1000) + 300); // 5 min
+
+    swap({
+      sellTokenAddress: sellToken.address,
+      buyTokenAddress: buyToken.address,
+      sellSymbol: sellToken.symbol,
+      buySymbol: buyToken.symbol,
+      amountIn: rawSellAmount,
+      amountOutMinimum,
+      recipient: address,
+      deadline,
+    });
+  }, [sellToken, buyToken, sellAmount, quote, address, isConnected, isSameToken, rawSellAmount, swap]);
 
   const formatBuyAmount = () => {
     if (!quote) return "";
@@ -180,37 +196,41 @@ export function SwapPanel() {
     if (sellToken.symbol === "ETH" && livePrice["ETH/USDC"]) {
       return `$${(amt * livePrice["ETH/USDC"]).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
     }
-    if (sellToken.symbol === "USDC" || sellToken.symbol === "USDT" || sellToken.symbol === "DAI") {
+    if (["USDC", "USDT", "DAI"].includes(sellToken.symbol)) {
       return `$${amt.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+    }
+    if (sellToken.symbol === "WBTC" && livePrice["BTC/USDC"]) {
+      return `$${(amt * livePrice["BTC/USDC"]).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
     }
     return "";
   };
 
   const resetState = () => {
     setStep("idle");
-    setTxResult(null);
     setErrorMsg(null);
     setSellAmount("");
+    resetSwap();
   };
 
-  // Determine button state
+  // Button config
   const getButtonConfig = (): { label: string; disabled: boolean; onClick: () => void } => {
     if (isSameToken) return { label: "Select Different Tokens", disabled: true, onClick: () => {} };
     if (!isConnected) return { label: "Connect Wallet", disabled: true, onClick: () => {} };
-    if (!sellAmount) return { label: "Enter Amount", disabled: true, onClick: () => {} };
+    if (!sellAmount || parseFloat(sellAmount) === 0) return { label: "Enter Amount", disabled: true, onClick: () => {} };
     if (!hasSufficientBalance) return { label: "Insufficient Balance", disabled: true, onClick: () => {} };
     if (quoteLoading) return { label: "Fetching Quote...", disabled: true, onClick: () => {} };
 
-    // Need approval for ERC-20 (not ETH)
+    // Need approval for ERC-20
     if (needsApproval && !isETH) {
       if (isApproving) return { label: `Approving ${sellToken.symbol}...`, disabled: true, onClick: () => {} };
       return { label: `Approve ${sellToken.symbol}`, disabled: false, onClick: handleApprove };
     }
 
-    if (step === "signing") return { label: "Signing Intent...", disabled: true, onClick: () => {} };
-    if (step === "submitting") return { label: "Submitting...", disabled: true, onClick: () => {} };
+    if (step === "swapping") return { label: "Confirm in Wallet...", disabled: true, onClick: () => {} };
+    if (step === "confirming") return { label: "Confirming...", disabled: true, onClick: () => {} };
+    if (step === "success") return { label: "Swap Complete!", disabled: true, onClick: () => {} };
 
-    return { label: "Sign & Submit Intent", disabled: false, onClick: handleSubmit };
+    return { label: "Swap", disabled: false, onClick: handleSwap };
   };
 
   const btn = getButtonConfig();
@@ -220,7 +240,7 @@ export function SwapPanel() {
       <div className="swap-panel-header">
         <h2 className="swap-panel-title">Swap</h2>
         <div className="swap-panel-settings">
-          <button className="swap-panel-setting-btn">0.5% slippage</button>
+          <button className="swap-panel-setting-btn">{DEFAULT_SLIPPAGE_BPS / 100}% slippage</button>
         </div>
       </div>
 
@@ -233,11 +253,12 @@ export function SwapPanel() {
               className="swap-panel-balance"
               onClick={() => {
                 if (sellBalanceFormatted) {
-                  // Set to max balance (leave some ETH for gas)
                   const maxVal = isETH
-                    ? Math.max(0, parseFloat(sellBalanceFormatted) - 0.01).toString()
+                    ? Math.max(0, parseFloat(sellBalanceFormatted) - 0.005).toString()
                     : sellBalanceFormatted;
                   setSellAmount(maxVal);
+                  setStep("idle");
+                  resetSwap();
                 }
               }}
               style={{ cursor: "pointer" }}
@@ -259,9 +280,9 @@ export function SwapPanel() {
               const val = e.target.value;
               if (val === "" || /^\d*\.?\d*$/.test(val)) {
                 setSellAmount(val);
-                setTxResult(null);
                 setErrorMsg(null);
                 setStep("idle");
+                resetSwap();
               }
             }}
           />
@@ -270,10 +291,7 @@ export function SwapPanel() {
             value={sellToken.symbol}
             onChange={(e) => {
               const t = TOKENS.find((tk) => tk.symbol === e.target.value);
-              if (t) {
-                setSellToken(t);
-                setStep("idle");
-              }
+              if (t) { setSellToken(t); setStep("idle"); resetSwap(); }
             }}
           >
             {TOKENS.map((t) => (
@@ -283,7 +301,7 @@ export function SwapPanel() {
             ))}
           </select>
         </div>
-        {sellAmount && (
+        {sellAmount && formatUsdValue() && (
           <div className="swap-panel-usd">{formatUsdValue()}</div>
         )}
         {sellAmount && !hasSufficientBalance && (
@@ -317,7 +335,7 @@ export function SwapPanel() {
             value={buyToken.symbol}
             onChange={(e) => {
               const t = TOKENS.find((tk) => tk.symbol === e.target.value);
-              if (t) setBuyToken(t);
+              if (t) { setBuyToken(t); resetSwap(); }
             }}
           >
             {TOKENS.map((t) => (
@@ -337,7 +355,7 @@ export function SwapPanel() {
       )}
 
       {/* Quote details */}
-      {quote && !isSameToken && (
+      {quote && !isSameToken && step !== "success" && (
         <div className="swap-panel-details">
           <div className="swap-panel-detail-row">
             <span>Rate</span>
@@ -364,12 +382,17 @@ export function SwapPanel() {
             </span>
           </div>
           <div className="swap-panel-detail-row">
-            <span>Fee</span>
-            <span>0.05%</span>
+            <span>Min. received</span>
+            <span>
+              {quote ? (
+                parseFloat(quote.buy_amount) * (1 - DEFAULT_SLIPPAGE_BPS / 10000) / 10 ** buyToken.decimals
+              ).toLocaleString("en-US", { maximumFractionDigits: 6 }) : "—"}{" "}
+              {buyToken.symbol}
+            </span>
           </div>
           <div className="swap-panel-detail-row">
-            <span>Settlement</span>
-            <span style={{ color: "var(--accent)" }}>Intent-based (solver network)</span>
+            <span>Network</span>
+            <span style={{ color: "var(--accent)" }}>Ethereum via Uniswap V3</span>
           </div>
         </div>
       )}
@@ -391,42 +414,69 @@ export function SwapPanel() {
 
       {/* Action button */}
       <button
-        className={`swap-panel-submit ${!isConnected && sellAmount ? "swap-panel-submit--connect" : ""}`}
+        className={`swap-panel-submit ${step === "success" ? "swap-panel-submit--success" : ""} ${!isConnected && sellAmount ? "swap-panel-submit--connect" : ""}`}
         disabled={btn.disabled}
         onClick={btn.onClick}
       >
         {btn.label}
       </button>
 
+      {/* Confirming */}
+      {step === "confirming" && swapTxHash && (
+        <div className="swap-panel-info">
+          Transaction submitted!{" "}
+          <a
+            href={`https://etherscan.io/tx/${swapTxHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "var(--accent)" }}
+          >
+            View on Etherscan
+          </a>
+        </div>
+      )}
+
       {/* Success */}
-      {step === "confirmed" && txResult && (
+      {step === "success" && swapTxHash && (
         <div className="swap-panel-success">
           <span>&#10003;</span>
           <div>
-            <div>Intent submitted successfully!</div>
-            {txResult.intentId && (
-              <div style={{ fontSize: "0.82rem", opacity: 0.8, marginTop: 4 }}>
-                ID: {txResult.intentId.slice(0, 12)}...{txResult.intentId.slice(-6)}
-              </div>
-            )}
-            <div style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: 4 }}>
-              Solvers are competing to fill your intent with optimal execution.
+            <div style={{ fontWeight: 600 }}>Swap successful!</div>
+            <div style={{ fontSize: "0.82rem", opacity: 0.85, marginTop: 4 }}>
+              Swapped {sellAmount} {sellToken.symbol} for ~{formatBuyAmount()} {buyToken.symbol}
             </div>
-            <button
-              onClick={resetState}
-              style={{
-                marginTop: 8,
-                padding: "6px 16px",
-                background: "rgba(6,214,160,0.15)",
-                border: "1px solid rgba(6,214,160,0.3)",
-                borderRadius: 8,
-                color: "var(--accent)",
-                cursor: "pointer",
-                fontSize: "0.82rem",
-              }}
-            >
-              New Swap
-            </button>
+            <div style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <a
+                href={`https://etherscan.io/tx/${swapTxHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  padding: "6px 14px",
+                  background: "rgba(6,214,160,0.12)",
+                  border: "1px solid rgba(6,214,160,0.25)",
+                  borderRadius: 8,
+                  color: "var(--accent, #06d6a0)",
+                  fontSize: "0.82rem",
+                  textDecoration: "none",
+                }}
+              >
+                View on Etherscan
+              </a>
+              <button
+                onClick={resetState}
+                style={{
+                  padding: "6px 14px",
+                  background: "rgba(124,92,252,0.1)",
+                  border: "1px solid rgba(124,92,252,0.25)",
+                  borderRadius: 8,
+                  color: "var(--accent, #7c5cfc)",
+                  cursor: "pointer",
+                  fontSize: "0.82rem",
+                }}
+              >
+                New Swap
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -434,9 +484,9 @@ export function SwapPanel() {
       {/* Error */}
       {step === "error" && errorMsg && (
         <div className="swap-panel-warning">
-          {errorMsg}
+          <span style={{ flex: 1 }}>{errorMsg}</span>
           <button
-            onClick={() => { setStep("idle"); setErrorMsg(null); }}
+            onClick={() => { setStep("idle"); setErrorMsg(null); resetSwap(); }}
             style={{
               marginLeft: 8,
               padding: "2px 10px",
@@ -446,9 +496,10 @@ export function SwapPanel() {
               color: "var(--red, #ef4444)",
               cursor: "pointer",
               fontSize: "0.78rem",
+              flexShrink: 0,
             }}
           >
-            Dismiss
+            Retry
           </button>
         </div>
       )}

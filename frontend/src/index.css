@@ -556,6 +556,11 @@ body::after {
   gap: 8px;
 }
 
+.swap-panel-submit--success {
+  background: var(--green) !important;
+  opacity: 0.8;
+}
+
 .swap-panel-info {
   margin-top: 8px;
   padding: 10px 14px;
