@@ -1122,6 +1122,35 @@ body::after {
   margin: 0;
 }
 
+.docs-lang-toggle {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.docs-lang-btn {
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.docs-lang-btn--active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.docs-lang-btn:hover:not(.docs-lang-btn--active) {
+  border-color: var(--text-dim);
+}
+
 .docs-cta-btn {
   display: inline-block;
   padding: 12px 32px;
