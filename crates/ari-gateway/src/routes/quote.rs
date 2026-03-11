@@ -61,11 +61,20 @@ pub fn cache() -> &'static Arc<RwLock<PriceCache>> {
 
 fn default_prices() -> HashMap<String, f64> {
     let mut m = HashMap::new();
-    m.insert("ETH".to_string(), 3500.0);
-    m.insert("WBTC".to_string(), 95000.0);
+    // Defaults are used only until live prices load (first 60s).
+    // These are approximate — live feeds will overwrite them.
+    m.insert("ETH".to_string(), 2000.0);
+    m.insert("WETH".to_string(), 2000.0);
+    m.insert("WBTC".to_string(), 85000.0);
     m.insert("USDC".to_string(), 1.0);
     m.insert("USDT".to_string(), 1.0);
     m.insert("DAI".to_string(), 1.0);
+    m.insert("UNI".to_string(), 7.0);
+    m.insert("LINK".to_string(), 14.0);
+    m.insert("AAVE".to_string(), 180.0);
+    m.insert("MKR".to_string(), 1500.0);
+    m.insert("PEPE".to_string(), 0.000008);
+    m.insert("SHIB".to_string(), 0.00001);
     m
 }
 
@@ -101,7 +110,7 @@ pub async fn refresh_prices() {
 }
 
 async fn fetch_coingecko(client: &reqwest::Client) -> Result<HashMap<String, f64>, ()> {
-    let ids = "ethereum,wrapped-bitcoin,usd-coin,tether,dai";
+    let ids = "ethereum,wrapped-bitcoin,usd-coin,tether,dai,uniswap,chainlink,aave,maker,pepe,shiba-inu";
     let url = format!(
         "https://api.coingecko.com/api/v3/simple/price?ids={}&vs_currencies=usd",
         ids
@@ -127,6 +136,12 @@ async fn fetch_coingecko(client: &reqwest::Client) -> Result<HashMap<String, f64
         ("usd-coin", "USDC"),
         ("tether", "USDT"),
         ("dai", "DAI"),
+        ("uniswap", "UNI"),
+        ("chainlink", "LINK"),
+        ("aave", "AAVE"),
+        ("maker", "MKR"),
+        ("pepe", "PEPE"),
+        ("shiba-inu", "SHIB"),
     ];
     for (cg_id, sym) in &symbols {
         if let Some(inner) = data.get(*cg_id) {
@@ -135,12 +150,16 @@ async fn fetch_coingecko(client: &reqwest::Client) -> Result<HashMap<String, f64
             }
         }
     }
-    tracing::info!("CoinGecko prices: {:?}", prices);
+    // WETH = ETH price
+    if let Some(eth) = prices.get("ETH").copied() {
+        prices.insert("WETH".to_string(), eth);
+    }
+    tracing::info!("CoinGecko prices: {} tokens updated", prices.len());
     Ok(prices)
 }
 
 async fn fetch_cryptocompare(client: &reqwest::Client) -> Result<HashMap<String, f64>, ()> {
-    let url = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=ETH,BTC&tsyms=USD";
+    let url = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=ETH,BTC,UNI,LINK,AAVE,MKR,SHIB&tsyms=USD";
 
     let resp = client.get(url).send().await.map_err(|e| {
         tracing::warn!("CryptoCompare fetch failed: {e}");
@@ -151,24 +170,35 @@ async fn fetch_cryptocompare(client: &reqwest::Client) -> Result<HashMap<String,
         return Err(());
     }
 
-    // Response: {"ETH":{"USD":2077},"BTC":{"USD":71000}}
     let data: HashMap<String, HashMap<String, f64>> = resp.json().await.map_err(|e| {
         tracing::warn!("CryptoCompare parse failed: {e}");
     })?;
 
     let mut prices = HashMap::new();
-    if let Some(eth) = data.get("ETH").and_then(|m| m.get("USD")) {
-        prices.insert("ETH".to_string(), *eth);
+    let mapping = [
+        ("ETH", "ETH"),
+        ("BTC", "WBTC"),
+        ("UNI", "UNI"),
+        ("LINK", "LINK"),
+        ("AAVE", "AAVE"),
+        ("MKR", "MKR"),
+        ("SHIB", "SHIB"),
+    ];
+    for (cc_sym, our_sym) in &mapping {
+        if let Some(usd) = data.get(*cc_sym).and_then(|m| m.get("USD")) {
+            prices.insert(our_sym.to_string(), *usd);
+        }
     }
-    if let Some(btc) = data.get("BTC").and_then(|m| m.get("USD")) {
-        prices.insert("WBTC".to_string(), *btc);
+    // WETH = ETH
+    if let Some(eth) = prices.get("ETH").copied() {
+        prices.insert("WETH".to_string(), eth);
     }
-    // Stables stay at 1.0
+    // Stables
     prices.insert("USDC".to_string(), 1.0);
     prices.insert("USDT".to_string(), 1.0);
     prices.insert("DAI".to_string(), 1.0);
 
-    tracing::info!("CryptoCompare prices: {:?}", prices);
+    tracing::info!("CryptoCompare prices: {} tokens updated", prices.len());
     Ok(prices)
 }
 
@@ -180,9 +210,9 @@ async fn price_usd(token: &str) -> f64 {
 
 fn token_decimals(token: &str) -> u32 {
     match token.to_uppercase().as_str() {
-        "ETH" | "DAI" => 18,
         "USDC" | "USDT" => 6,
         "WBTC" => 8,
+        // ETH, WETH, DAI, UNI, LINK, AAVE, MKR, PEPE, SHIB all use 18
         _ => 18,
     }
 }

@@ -4,9 +4,13 @@ import { API_URL } from "../config";
 interface Pool {
   address: string;
   token0: string;
+  token0_address: string;
   token1: string;
+  token1_address: string;
   fee_tier: number;
   liquidity: string;
+  volume_usd_24h: string;
+  tvl_usd: string;
 }
 
 export function PoolsPage() {
@@ -23,10 +27,12 @@ export function PoolsPage() {
   return (
     <div className="page-panel">
       <h2 className="page-title">Liquidity Pools</h2>
-      <p className="page-sub">Active Uniswap V3 pools routed by ARI solvers</p>
+      <p className="page-sub">Live Uniswap V3 pools routed by ARI solvers</p>
 
       {loading ? (
         <div className="page-loading">Loading pools...</div>
+      ) : pools.length === 0 ? (
+        <div className="page-empty">No pools available</div>
       ) : (
         <div className="page-table-wrap">
           <table className="page-table">
@@ -34,7 +40,8 @@ export function PoolsPage() {
               <tr>
                 <th>Pair</th>
                 <th>Fee Tier</th>
-                <th>Liquidity</th>
+                <th>TVL</th>
+                <th>Volume (24h)</th>
                 <th>Contract</th>
               </tr>
             </thead>
@@ -47,7 +54,8 @@ export function PoolsPage() {
                     <span className="page-pair-token">{p.token1}</span>
                   </td>
                   <td>{(p.fee_tier / 10000).toFixed(2)}%</td>
-                  <td>{formatLiquidity(p.liquidity)}</td>
+                  <td>{formatUsd(p.tvl_usd)}</td>
+                  <td>{formatUsd(p.volume_usd_24h)}</td>
                   <td>
                     <a
                       href={`https://etherscan.io/address/${p.address}`}
@@ -68,9 +76,11 @@ export function PoolsPage() {
   );
 }
 
-function formatLiquidity(raw: string): string {
+function formatUsd(raw: string): string {
   const n = parseFloat(raw);
-  if (n >= 1e18) return `${(n / 1e18).toFixed(1)} ETH`;
-  if (n >= 1e12) return `${(n / 1e6).toFixed(0)} USDC`;
-  return raw;
+  if (isNaN(n) || n === 0) return "$0";
+  if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
+  if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
+  if (n >= 1e3) return `$${(n / 1e3).toFixed(1)}K`;
+  return `$${n.toFixed(2)}`;
 }

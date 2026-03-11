@@ -176,22 +176,32 @@ async fn register_solver(
 }
 
 async fn solver_history(
-    State(_state): State<Arc<AppState>>,
+    State(state): State<Arc<AppState>>,
     Path(id): Path<String>,
 ) -> Json<HistoryResponse> {
-    // Mock fill history for the solver
-    let now = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_secs() as i64;
-    let fills = (0..5)
-        .map(|i| FillRecord {
-            intent_id: format!("intent_{}_{}", id, i),
-            price_improvement: 0.15 + (i as f64) * 0.05,
-            amount: format!("{}", 1_000_000_000u64 * (i + 1)),
-            timestamp: now - (i as i64) * 3600,
-        })
-        .collect();
+    let db = state.db.lock().await;
+
+    // Query actual fills from solver_fills table
+    let fills = match db.prepare(
+        "SELECT intent_id, price_improvement, amount, created_at
+         FROM solver_fills WHERE solver_id = ?1
+         ORDER BY created_at DESC LIMIT 50",
+    ) {
+        Ok(mut stmt) => {
+            stmt.query_map(params![id], |row| {
+                Ok(FillRecord {
+                    intent_id: row.get(0)?,
+                    price_improvement: row.get(1)?,
+                    amount: row.get(2)?,
+                    timestamp: row.get(3)?,
+                })
+            })
+            .map(|rows| rows.filter_map(|r| r.ok()).collect())
+            .unwrap_or_default()
+        }
+        Err(_) => Vec::new(),
+    };
+
     Json(HistoryResponse { fills })
 }
 

@@ -83,31 +83,7 @@ pub fn init_db(path: &str) -> Result<Connection> {
         );",
     )?;
 
-    // Seed mock trader stats
-    let count: i64 = conn.query_row("SELECT COUNT(*) FROM trader_stats", [], |r| r.get(0))?;
-    if count == 0 {
-        let mock_traders: &[(&str, &str, f64, i64, &str)] = &[
-            ("0xA1b2C3d4E5f6789012345678901234567890abCD", "125000000000", 0.72, 342, "89000000000000"),
-            ("0xB2c3D4e5F67890123456789012345678901BcDeF", "98000000000", 0.68, 287, "67000000000000"),
-            ("0xC3d4E5f678901234567890123456789012CdEfAb", "76000000000", 0.65, 198, "54000000000000"),
-            ("0xD4e5F6789012345678901234567890123DeFaBcD", "54000000000", 0.61, 156, "41000000000000"),
-            ("0xE5f67890123456789012345678901234EfAbCdEf", "32000000000", 0.58, 124, "29000000000000"),
-            ("0xF678901234567890123456789012345FaBcDeFaB", "21000000000", 0.55, 98, "18000000000000"),
-            ("0x1789012345678901234567890123456AbCdEfAbC", "15000000000", 0.52, 76, "12000000000000"),
-            ("0x2890123456789012345678901234567BcDeFaBcD", "8000000000", 0.49, 54, "7000000000000"),
-            ("0x3901234567890123456789012345678CdEfAbCdE", "-5000000000", 0.42, 43, "5000000000000"),
-            ("0x4012345678901234567890123456789DeFaBcDeF", "-12000000000", 0.38, 31, "3000000000000"),
-        ];
-        for (addr, pnl, wr, tc, vol) in mock_traders {
-            conn.execute(
-                "INSERT INTO trader_stats (address, total_pnl, win_rate, trade_count, volume)
-                 VALUES (?1, ?2, ?3, ?4, ?5)",
-                params![addr, pnl, wr, tc, vol],
-            )?;
-        }
-    }
-
-    // Solver marketplace table
+    // Solver marketplace tables
     conn.execute_batch(
         "CREATE TABLE IF NOT EXISTS solvers (
             id TEXT PRIMARY KEY,
@@ -121,31 +97,16 @@ pub fn init_db(path: &str) -> Result<Connection> {
             score REAL DEFAULT 50.0,
             active INTEGER DEFAULT 1,
             created_at INTEGER NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS solver_fills (
+            id TEXT PRIMARY KEY,
+            solver_id TEXT NOT NULL,
+            intent_id TEXT NOT NULL,
+            price_improvement REAL DEFAULT 0.0,
+            amount TEXT NOT NULL,
+            created_at INTEGER NOT NULL
         );",
     )?;
-
-    // Seed mock solvers
-    let solver_count: i64 = conn.query_row("SELECT COUNT(*) FROM solvers", [], |r| r.get(0))?;
-    if solver_count == 0 {
-        let now = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as i64;
-        let mock_solvers: &[(&str, &str, &str, &str, f64, f64, &str, i64, f64)] = &[
-            ("solver_1", "0xS01ver1111111111111111111111111111111111", "Wintermute", "https://solver.wintermute.com/v1", 0.94, 0.12, "4500000000000000", 12840, 92.5),
-            ("solver_2", "0xS01ver2222222222222222222222222222222222", "Flashbots Protect", "https://protect.flashbots.net/solver", 0.91, 0.18, "3200000000000000", 9650, 88.3),
-            ("solver_3", "0xS01ver3333333333333333333333333333333333", "ParaSwap Delta", "https://delta.paraswap.io/solve", 0.87, 0.09, "2100000000000000", 7320, 79.1),
-            ("solver_4", "0xS01ver4444444444444444444444444444444444", "1inch Fusion", "https://fusion.1inch.io/solver", 0.85, 0.15, "1800000000000000", 5410, 75.6),
-            ("solver_5", "0xS01ver5555555555555555555555555555555555", "CoW Protocol", "https://solver.cow.fi/v1", 0.82, 0.21, "980000000000000", 3200, 71.2),
-        ];
-        for (id, addr, name, endpoint, fr, ai, vol, fills, score) in mock_solvers {
-            conn.execute(
-                "INSERT INTO solvers (id, address, name, endpoint, fill_rate, avg_improvement, total_volume, total_fills, score, active, created_at)
-                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, 1, ?10)",
-                params![id, addr, name, endpoint, fr, ai, vol, fills, score, now],
-            )?;
-        }
-    }
 
     Ok(conn)
 }
@@ -270,6 +231,28 @@ pub fn list_yield_positions(
         ))
     })?;
     rows.collect()
+}
+
+/// Record a trader's stats update (upsert).
+pub fn update_trader_stats(
+    conn: &Connection,
+    address: &str,
+    pnl_delta: &str,
+    volume_delta: &str,
+    is_win: bool,
+) -> Result<()> {
+    // Upsert: insert if not exists, update if exists
+    conn.execute(
+        "INSERT INTO trader_stats (address, total_pnl, win_rate, trade_count, volume)
+         VALUES (?1, ?2, CASE WHEN ?3 THEN 1.0 ELSE 0.0 END, 1, ?4)
+         ON CONFLICT(address) DO UPDATE SET
+           total_pnl = CAST(CAST(total_pnl AS REAL) + CAST(?2 AS REAL) AS TEXT),
+           trade_count = trade_count + 1,
+           win_rate = (win_rate * (trade_count - 1) + CASE WHEN ?3 THEN 1.0 ELSE 0.0 END) / trade_count,
+           volume = CAST(CAST(volume AS REAL) + CAST(?4 AS REAL) AS TEXT)",
+        params![address, pnl_delta, is_win, volume_delta],
+    )?;
+    Ok(())
 }
 
 fn row_to_intent(row: &rusqlite::Row<'_>) -> rusqlite::Result<StoredIntent> {

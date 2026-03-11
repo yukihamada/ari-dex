@@ -31,6 +31,10 @@ export function SolversPage() {
 
       {loading ? (
         <div className="page-loading">Loading solvers...</div>
+      ) : solvers.length === 0 ? (
+        <div className="page-empty">
+          No solvers registered yet. Register your solver via the API to start competing for intent fills.
+        </div>
       ) : (
         <>
           <div className="page-stat-row">

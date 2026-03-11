@@ -4,9 +4,10 @@ import { API_URL } from "../config";
 
 interface Holding {
   token: string;
-  balance: string;
-  value_usd: number;
-  allocation_pct: number;
+  address: string;
+  amount: string;
+  usd_value: number;
+  percentage: number;
 }
 
 interface Trade {
@@ -46,7 +47,7 @@ export function PortfolioPage() {
     );
   }
 
-  const totalValue = holdings.reduce((sum, h) => sum + h.value_usd, 0);
+  const totalValue = holdings.reduce((sum, h) => sum + h.usd_value, 0);
 
   return (
     <div className="page-panel">
@@ -54,7 +55,7 @@ export function PortfolioPage() {
       <p className="page-sub">{address?.slice(0, 8)}...{address?.slice(-4)}</p>
 
       {loading ? (
-        <div className="page-loading">Loading portfolio...</div>
+        <div className="page-loading">Loading on-chain balances...</div>
       ) : (
         <>
           <div className="page-stat-row">
@@ -84,9 +85,9 @@ export function PortfolioPage() {
                     {holdings.map((h) => (
                       <tr key={h.token}>
                         <td className="page-pair-token">{h.token}</td>
-                        <td>{parseFloat(h.balance).toLocaleString("en-US", { maximumFractionDigits: 6 })}</td>
-                        <td>${h.value_usd.toLocaleString("en-US", { maximumFractionDigits: 2 })}</td>
-                        <td>{h.allocation_pct.toFixed(1)}%</td>
+                        <td>{parseFloat(h.amount).toLocaleString("en-US", { maximumFractionDigits: 6 })}</td>
+                        <td>${h.usd_value.toLocaleString("en-US", { maximumFractionDigits: 2 })}</td>
+                        <td>{h.percentage.toFixed(1)}%</td>
                       </tr>
                     ))}
                   </tbody>
@@ -119,7 +120,7 @@ export function PortfolioPage() {
           )}
 
           {holdings.length === 0 && trades.length === 0 && (
-            <div className="page-empty">No holdings or trade history yet. Start swapping!</div>
+            <div className="page-empty">No holdings or trade history found for this address</div>
           )}
         </>
       )}
