@@ -74,12 +74,8 @@ impl OrderBook {
     pub fn match_orders(&mut self) -> Vec<(u64, u64, [u8; 32])> {
         let mut fills = Vec::new();
 
-        loop {
-            // Get best bid (highest price) and best ask (lowest price)
-            let best_bid_price = match self.bids.keys().next_back().copied() {
-                Some(p) => p,
-                None => break,
-            };
+        while let Some(best_bid_price) = self.bids.keys().next_back().copied() {
+            // Get best ask (lowest price)
             let best_ask_price = match self.asks.keys().next().copied() {
                 Some(p) => p,
                 None => break,

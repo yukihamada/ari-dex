@@ -1,7 +1,7 @@
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { injected } from "wagmi/connectors";
 
-type Page = "swap" | "pools" | "portfolio" | "solvers";
+type Page = "swap" | "pools" | "liquidity" | "portfolio" | "solvers";
 
 interface HeaderProps {
   currentPage: Page;
@@ -19,6 +19,7 @@ export function Header({ currentPage, onNavigate }: HeaderProps) {
   const navItems: { page: Page; label: string }[] = [
     { page: "swap", label: "Swap" },
     { page: "pools", label: "Pools" },
+    { page: "liquidity", label: "Liquidity" },
     { page: "portfolio", label: "Portfolio" },
     { page: "solvers", label: "Solvers" },
   ];

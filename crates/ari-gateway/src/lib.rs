@@ -5,7 +5,9 @@
 
 pub mod app;
 pub mod db;
+pub mod executor;
 pub mod middleware;
 pub mod routes;
+pub mod solver_worker;
 pub mod validation;
 pub mod ws;

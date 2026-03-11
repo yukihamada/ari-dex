@@ -4,6 +4,9 @@ use rusqlite::{params, Connection, Result};
 
 use crate::app::StoredIntent;
 
+/// Row type returned by [`list_yield_positions`].
+pub type YieldPositionRow = (String, String, String, String, String, u64);
+
 /// Initialize the database, creating tables if they don't exist.
 pub fn init_db(path: &str) -> Result<Connection> {
     let conn = Connection::open(path)?;
@@ -163,6 +166,20 @@ pub fn update_intent_status(conn: &Connection, id: &str, status: &str) -> Result
     Ok(changed > 0)
 }
 
+/// List intents by status, up to `limit`.
+pub fn list_intents_by_status(
+    conn: &Connection,
+    status: &str,
+    limit: usize,
+) -> Result<Vec<StoredIntent>> {
+    let mut stmt = conn.prepare(
+        "SELECT id, sender, sell_token, buy_token, sell_amount, min_buy_amount, status, created_at
+         FROM intents WHERE status = ?1 ORDER BY created_at ASC LIMIT ?2",
+    )?;
+    let rows = stmt.query_map(params![status, limit as i64], row_to_intent)?;
+    rows.collect()
+}
+
 /// List intents for a specific sender address, optionally filtered by status.
 pub fn list_intents_by_sender(
     conn: &Connection,
@@ -215,7 +232,7 @@ pub fn insert_yield_position(
 pub fn list_yield_positions(
     conn: &Connection,
     owner: &str,
-) -> Result<Vec<(String, String, String, String, String, u64)>> {
+) -> Result<Vec<YieldPositionRow>> {
     let mut stmt = conn.prepare(
         "SELECT id, owner, strategy_id, token, amount, created_at
          FROM yield_positions WHERE owner = ?1 ORDER BY created_at DESC",

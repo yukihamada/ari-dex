@@ -2,12 +2,12 @@
 
 use std::sync::Arc;
 
-use axum::extract::{Path, State};
+use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::app::{AppState, StoredIntent};
 use crate::db;
@@ -16,25 +16,54 @@ use crate::ws;
 
 #[derive(Deserialize)]
 struct SubmitIntentRequest {
-    /// Hex-encoded sender address.
     sender: String,
-    /// Sell token symbol.
     sell_token: String,
-    /// Buy token symbol.
     buy_token: String,
-    /// Sell amount as a decimal string.
     sell_amount: String,
-    /// Minimum buy amount as a decimal string.
     min_buy_amount: String,
-    /// Optional referral code for tracking.
+    #[serde(default)]
+    signature: Option<String>,
+    #[serde(default)]
+    deadline: Option<u64>,
+    #[serde(default)]
+    #[allow(dead_code)]
+    nonce: Option<u64>,
+    #[serde(default)]
     referral_code: Option<String>,
+}
+
+#[derive(Deserialize)]
+struct ListIntentsQuery {
+    #[serde(default = "default_limit")]
+    limit: usize,
+    #[serde(default)]
+    status: Option<String>,
+}
+
+fn default_limit() -> usize {
+    50
+}
+
+#[derive(Serialize)]
+struct IntentListResponse {
+    intents: Vec<StoredIntent>,
+    count: usize,
 }
 
 async fn submit_intent(
     State(state): State<Arc<AppState>>,
     Json(body): Json<SubmitIntentRequest>,
 ) -> impl IntoResponse {
-    // Validate amounts before processing.
+    // Validate sender address
+    if let Err(e) = validation::validate_address(&body.sender) {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({"error": format!("invalid sender: {e}")})),
+        )
+            .into_response();
+    }
+
+    // Validate amounts
     if let Err(e) = validation::validate_amount(&body.sell_amount) {
         return (
             StatusCode::BAD_REQUEST,
@@ -50,12 +79,28 @@ async fn submit_intent(
             .into_response();
     }
 
+    // Verify EIP-712 signature
+    if let Err(e) = validation::verify_intent_signature(
+        &body.sender,
+        &body.sell_token,
+        &body.buy_token,
+        &body.sell_amount,
+        &body.min_buy_amount,
+        body.deadline,
+        body.signature.as_deref(),
+    ) {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({"error": format!("signature verification failed: {e}")})),
+        )
+            .into_response();
+    }
+
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap_or_default()
         .as_secs();
 
-    // Generate a unique ID using timestamp + random suffix
     let intent_id = format!(
         "0x{:016x}{:048x}",
         now,
@@ -85,12 +130,9 @@ async fn submit_intent(
             )
                 .into_response();
         }
-        // Track referral if a code was provided.
         if let Some(ref code) = referral_code {
             crate::routes::referral::track_referral(&conn, code, &stored.sell_amount);
         }
-
-        // Update trader stats for social trading leaderboard.
         let _ = db::update_trader_stats(&conn, &stored.sender, &stored.sell_amount, &stored.sell_amount, true);
     }
 
@@ -126,8 +168,40 @@ async fn get_intent(
     }
 }
 
+async fn list_intents(
+    State(state): State<Arc<AppState>>,
+    Query(params): Query<ListIntentsQuery>,
+) -> impl IntoResponse {
+    let conn = state.db.lock().await;
+    let limit = params.limit.min(200);
+    let intents = match params.status {
+        Some(ref status) => {
+            // List by status
+            let mut stmt = conn.prepare(
+                "SELECT id, sender, sell_token, buy_token, sell_amount, min_buy_amount, status, created_at
+                 FROM intents WHERE status = ?1 ORDER BY created_at DESC LIMIT ?2",
+            ).unwrap();
+            stmt.query_map(rusqlite::params![status, limit as i64], |row| {
+                Ok(StoredIntent {
+                    intent_id: row.get(0)?,
+                    sender: row.get(1)?,
+                    sell_token: row.get(2)?,
+                    buy_token: row.get(3)?,
+                    sell_amount: row.get(4)?,
+                    min_buy_amount: row.get(5)?,
+                    status: row.get(6)?,
+                    created_at: row.get(7)?,
+                })
+            }).unwrap().filter_map(|r| r.ok()).collect::<Vec<_>>()
+        }
+        None => db::list_intents(&conn, limit).unwrap_or_default(),
+    };
+    let count = intents.len();
+    Json(IntentListResponse { intents, count }).into_response()
+}
+
 pub fn router() -> Router<Arc<AppState>> {
     Router::new()
-        .route("/v1/intents", post(submit_intent))
+        .route("/v1/intents", post(submit_intent).get(list_intents))
         .route("/v1/intents/:id", get(get_intent))
 }

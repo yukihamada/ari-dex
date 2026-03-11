@@ -60,6 +60,9 @@ pub fn build_router(engine: EngineState) -> Router {
         ws_connections: std::sync::atomic::AtomicUsize::new(0),
     });
 
+    // Start solver background worker
+    crate::solver_worker::spawn_solver_worker(state.clone());
+
     let cors = CorsLayer::new()
         .allow_origin([
             "http://localhost:3000".parse::<HeaderValue>().unwrap(),
@@ -92,6 +95,7 @@ pub fn build_router(engine: EngineState) -> Router {
         .merge(routes::portfolio::router())
         .merge(routes::yield_agg::router())
         .merge(routes::positions::router())
+        .merge(routes::settlement::router())
         .merge(ws::router())
         .fallback_service(serve_dir)
         .layer(axum_mw::from_fn(middleware::rate_limit_middleware))

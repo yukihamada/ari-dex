@@ -15,12 +15,13 @@ function getDomain(chainId: number) {
 }
 
 /** EIP-712 type definition for Intent struct. */
+/** Must match Settlement.sol INTENT_TYPEHASH field order exactly. */
 const INTENT_TYPES = {
   Intent: [
     { name: "sender", type: "address" },
     { name: "sellToken", type: "address" },
-    { name: "buyToken", type: "address" },
     { name: "sellAmount", type: "uint256" },
+    { name: "buyToken", type: "address" },
     { name: "minBuyAmount", type: "uint256" },
     { name: "deadline", type: "uint256" },
     { name: "nonce", type: "uint256" },
@@ -64,8 +65,8 @@ export function useSignIntent() {
         message: {
           sender: params.sender as `0x${string}`,
           sellToken: params.sellToken.address as `0x${string}`,
-          buyToken: params.buyToken.address as `0x${string}`,
           sellAmount: rawSellAmount,
+          buyToken: params.buyToken.address as `0x${string}`,
           minBuyAmount: BigInt(params.minBuyAmount),
           deadline,
           nonce,

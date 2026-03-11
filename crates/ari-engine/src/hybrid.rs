@@ -94,8 +94,8 @@ impl HybridRouter {
             return Venue::BatchAuction;
         }
 
-        let clmm_available = pool.map_or(false, |p| p.liquidity() > 0);
-        let ob_available = orderbook.map_or(false, |ob| {
+        let clmm_available = pool.is_some_and(|p| p.liquidity() > 0);
+        let ob_available = orderbook.is_some_and(|ob| {
             ob.best_bid().is_some() && ob.best_ask().is_some()
         });
 

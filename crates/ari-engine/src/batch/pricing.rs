@@ -181,7 +181,7 @@ fn find_intersection(
             .iter()
             .filter(|p| p.price >= price)
             .map(|p| p.cumulative_qty)
-            .last()
+            .next_back()
             .unwrap_or(0);
 
         // Supply at this price: total quantity from sellers willing to sell <= price
@@ -189,7 +189,7 @@ fn find_intersection(
             .iter()
             .filter(|p| p.price <= price)
             .map(|p| p.cumulative_qty)
-            .last()
+            .next_back()
             .unwrap_or(0);
 
         // Volume that can clear at this price

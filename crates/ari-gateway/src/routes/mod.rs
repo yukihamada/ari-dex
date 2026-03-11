@@ -13,4 +13,5 @@ pub mod rfq;
 pub mod social;
 pub mod solvers;
 pub mod tokens;
+pub mod settlement;
 pub mod yield_agg;

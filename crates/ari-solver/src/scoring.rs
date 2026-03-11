@@ -30,7 +30,7 @@ pub fn score_solution(intent: &Intent, solution: &Solution) -> f64 {
     let raw = price_score * PRICE_WEIGHT + gas_score * GAS_WEIGHT + exec_score * EXEC_WEIGHT;
 
     // Clamp to [0, 100].
-    raw.max(0.0).min(100.0)
+    raw.clamp(0.0, 100.0)
 }
 
 /// Price improvement: how much better the solution's output is compared to the
@@ -50,7 +50,7 @@ fn price_improvement_score(intent: &Intent, solution: &Solution) -> f64 {
     // Map [-inf, +inf] improvement ratio to [0, 100].
     // 0% improvement → 50, +10% → 100, -10% → 0
     let score = 50.0 + improvement * 500.0; // 1% → 5 points
-    score.max(0.0).min(100.0)
+    score.clamp(0.0, 100.0)
 }
 
 /// Gas efficiency: lower gas cost scores higher.

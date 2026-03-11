@@ -109,8 +109,8 @@ impl DutchAuction {
         if elapsed >= self.duration {
             return self.end_price;
         }
-        let elapsed_ms = elapsed.as_millis() as u128;
-        let duration_ms = self.duration.as_millis() as u128;
+        let elapsed_ms = elapsed.as_millis();
+        let duration_ms = self.duration.as_millis();
         if duration_ms == 0 {
             return self.end_price;
         }

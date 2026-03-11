@@ -785,6 +785,126 @@ body::after {
   color: #ef4444;
 }
 
+/* ===== Liquidity Page ===== */
+.lp-form {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.lp-section-title {
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.lp-positions .lp-section-title {
+  margin-top: 8px;
+}
+
+.lp-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 550;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  margin-top: 10px;
+  letter-spacing: 0.3px;
+}
+
+.lp-select,
+.lp-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--transition);
+  appearance: none;
+}
+
+.lp-select:focus,
+.lp-input:focus {
+  border-color: var(--accent);
+}
+
+.lp-select option {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.lp-range-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.lp-range-row > div {
+  flex: 1;
+}
+
+.lp-input-half {
+  width: 100%;
+}
+
+.lp-button {
+  margin-top: 16px;
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.lp-button:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.25);
+}
+
+.lp-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.lp-message {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: var(--green-dim);
+  border: 1px solid rgba(0, 227, 158, 0.2);
+  border-radius: var(--radius-sm);
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.lp-remove-btn {
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 77, 106, 0.3);
+  background: var(--red-dim);
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.lp-remove-btn:hover {
+  border-color: var(--red);
+  background: rgba(255, 77, 106, 0.2);
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 640px) {
   .header {

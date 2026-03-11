@@ -47,7 +47,7 @@ pub fn tick_to_sqrt_price(tick: i32) -> u128 {
     let result = result as u128;
 
     // Clamp to valid range
-    result.max(MIN_SQRT_PRICE).min(MAX_SQRT_PRICE)
+    result.max(MIN_SQRT_PRICE)
 }
 
 /// Converts a Q64.96 sqrt price to the nearest tick index.
@@ -71,7 +71,7 @@ pub fn sqrt_price_to_tick(sqrt_price: u128) -> i32 {
     let log_base = 1.0001_f64.ln();
     let tick = (2.0 * ratio.ln() / log_base).floor() as i32;
 
-    tick.max(MIN_TICK).min(MAX_TICK)
+    tick.clamp(MIN_TICK, MAX_TICK)
 }
 
 /// Computes the amount of token0 for a given liquidity and price range.
@@ -154,8 +154,7 @@ pub fn get_next_sqrt_price_from_input(
         // Adding token1 => price goes up
         // next = sqrt_price + amount_in * Q96 / L
         let delta = mul_div(amount_in, Q96, liquidity);
-        let result = sqrt_price + delta;
-        result.min(MAX_SQRT_PRICE)
+        sqrt_price + delta
     }
 }
 
@@ -187,8 +186,7 @@ pub fn get_next_sqrt_price_from_output(
             return MAX_SQRT_PRICE;
         }
         let denominator = liquidity - product;
-        let result = mul_div(liquidity, sqrt_price, denominator);
-        result.min(MAX_SQRT_PRICE)
+        mul_div(liquidity, sqrt_price, denominator)
     }
 }
 

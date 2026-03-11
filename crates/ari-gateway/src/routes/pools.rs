@@ -108,8 +108,15 @@ async fn fetch_pools_from_subgraph() -> Result<Vec<PoolInfo>, ()> {
 
     let body = serde_json::json!({ "query": query });
 
-    // Uniswap V3 public subgraph endpoint
-    let url = "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3";
+    // Use API key if available, otherwise try public endpoint
+    let url = match std::env::var("SUBGRAPH_API_KEY") {
+        Ok(key) if !key.is_empty() => format!(
+            "https://gateway.thegraph.com/api/{}/subgraphs/id/5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV",
+            key
+        ),
+        _ => "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3".to_string(),
+    };
+    let url = &url;
 
     let resp = client.post(url).json(&body).send().await.map_err(|e| {
         tracing::warn!("Subgraph fetch failed: {e}");

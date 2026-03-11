@@ -107,11 +107,10 @@ fn estimate_swap_output(amount: u128, pool: &PoolInfo) -> u128 {
     let after_fee = amount * (10_000 - pool.fee_bps as u128) / 10_000;
     // Simple price-impact model: impact = amount / (liquidity + amount)
     // output = after_fee * liquidity / (liquidity + amount)
-    let output = after_fee
+    after_fee
         .checked_mul(pool.liquidity)
         .unwrap_or(0)
-        / (pool.liquidity.saturating_add(amount));
-    output
+        / (pool.liquidity.saturating_add(amount))
 }
 
 /// Finds the best route from `sell_token` to `buy_token` across `pools`.
@@ -141,7 +140,7 @@ pub fn find_best_route(
             let total_fee: u32 = state.hops.iter().map(|h| h.fee_bps).sum();
             let is_better = best_route
                 .as_ref()
-                .map_or(true, |r| state.output > r.estimated_output);
+                .is_none_or(|r| state.output > r.estimated_output);
             if is_better {
                 best_route = Some(Route {
                     hops: state.hops.clone(),
